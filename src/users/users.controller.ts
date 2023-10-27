@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 
 @Controller('api/users')
@@ -21,6 +21,29 @@ export class UsersController {
     // return request;
     const data = request;
     return this.client.send('findAllUsersFilter', data);
+  }
+  @Get('/change')
+  async changeUser(@Query() request: any) {
+    // return request;
+    const data = request;
+    return this.client.send('findChangeUsersFilter', data);
+  }
+  @Get('/parent/account')
+  async parent(@Query() request: any) {
+    // return request;
+    const data = request;
+    return this.client.send('parentUserFilter', data);
+  }
+
+  @Patch('/:status/:id')
+  async enableUsers(@Param('id') id: number, @Param('status') status: string) {
+    const request = {
+      status,
+      id,
+    };
+    if (status === 'enable' || status === 'disable') {
+      return this.client.send('changeStatusUser', request);
+    }
   }
 
   @Get('/:id')
