@@ -15,6 +15,11 @@ export class UsersController {
   @Client({ transport: Transport.TCP, options: { port: 3001 } })
   private readonly client: ClientProxy;
 
+  @Get('/get/authenticated')
+  async authenti() {
+    return this.client.send('authUser', 'all');
+  }
+
   @Get('/filter')
   async getAdminData(@Query() request: any) {
     let data = request;
