@@ -4,8 +4,9 @@ import { RolesController } from './roles/roles.controller';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ProvinsiModule } from './provinsi/provinsi.module';
+import { KotaModule } from './kota/kota.module';
 
 @Module({
-  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule],
+  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule],
 })
 export class AppModule {}

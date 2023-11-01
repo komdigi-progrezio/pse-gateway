@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 
 @Controller('api/provinsi')
@@ -17,8 +26,31 @@ export class ProvinsiController {
     return this.client.send('filterProvinsi', request);
   }
 
+  @Get('/:id')
+  async show(@Param() data: any) {
+    // return data.id;
+    return this.client.send('findOneProvinsi', data.id);
+  }
+  @Get('/:id/kota')
+  async filterPerProvince(@Param() data: any) {
+    // return data.id;
+    return this.client.send('filterPerProvince', data.id);
+  }
+
   @Post()
   async create(@Body() data: any) {
     return this.client.send('createProvinsi', data);
+  }
+
+  @Delete('/:id')
+  async destroy(@Param('id') id: number) {
+    return this.client.send('removeProvinsi', id);
+  }
+
+  @Patch('/:id')
+  async update(@Param('id') id: number, @Body() data: any) {
+    data.id = id;
+
+    return this.client.send('updateProvinsi', data);
   }
 }
