@@ -23,6 +23,7 @@ export class KotaController {
 
   @Get('/filter')
   async filter(@Query() request: any) {
+    // return request;
     return this.client.send('filterAllKota', request);
   }
 

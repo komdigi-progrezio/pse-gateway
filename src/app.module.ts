@@ -9,9 +9,10 @@ import { PublicModule } from './public/public.module';
 import { ParconfigModule } from './parconfig/parconfig.module';
 import { ParinstansiController } from './parinstansi/parinstansi.controller';
 import { ApiModule } from './api/api.module';
+import { ParinstansiModule } from './parinstansi/parinstansi.module';
 
 @Module({
-  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule, PublicModule, ParconfigModule, ApiModule],
+  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule, PublicModule, ParconfigModule, ApiModule, ParinstansiModule],
   controllers: [ParinstansiController],
 })
 export class AppModule {}

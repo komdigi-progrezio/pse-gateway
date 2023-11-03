@@ -65,6 +65,10 @@ export class UsersController {
     data.id = id;
     return this.client.send('updateProfile', data);
   }
+  @Patch('/approved/account/change')
+  async approvedAccountChange(@Body() data: any) {
+    return this.client.send('approvedAccountChange', data);
+  }
 
   @Patch('/:status/:id')
   async enableUsers(@Param('id') id: number, @Param('status') status: string) {
@@ -85,6 +89,11 @@ export class UsersController {
   @Post()
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
+  }
+
+  @Post('/notification-token')
+  async notifToken(@Body() data: any) {
+    return this.client.send('notifToken', data);
   }
 
   @Post('/:id')

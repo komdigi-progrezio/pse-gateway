@@ -47,7 +47,7 @@ export class ProvinsiController {
     return this.client.send('removeProvinsi', id);
   }
 
-  @Patch('/:id')
+  @Post('/:id')
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
 

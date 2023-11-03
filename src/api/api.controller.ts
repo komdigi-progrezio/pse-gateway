@@ -3,7 +3,7 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 
 @Controller('api')
 export class ApiController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({ transport: Transport.TCP, options: { port: 3001 } })
   private readonly client: ClientProxy;
 
   @Post('/setup/admin/coy')
