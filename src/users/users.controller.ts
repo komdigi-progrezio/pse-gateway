@@ -15,9 +15,9 @@ export class UsersController {
   @Client({ transport: Transport.TCP, options: { port: 3001 } })
   private readonly client: ClientProxy;
 
-  @Get('/test')
-  async test(@Query() request: any) {
-    return this.store(request);
+  @Get('/get/authenticated')
+  async authenti() {
+    return this.client.send('authUser', 'all');
   }
 
   @Get('/filter')
@@ -65,6 +65,10 @@ export class UsersController {
     data.id = id;
     return this.client.send('updateProfile', data);
   }
+  @Patch('/approved/account/change')
+  async approvedAccountChange(@Body() data: any) {
+    return this.client.send('approvedAccountChange', data);
+  }
 
   @Patch('/:status/:id')
   async enableUsers(@Param('id') id: number, @Param('status') status: string) {
@@ -85,6 +89,11 @@ export class UsersController {
   @Post()
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
+  }
+
+  @Post('/notification-token')
+  async notifToken(@Body() data: any) {
+    return this.client.send('notifToken', data);
   }
 
   @Post('/:id')

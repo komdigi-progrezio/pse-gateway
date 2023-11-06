@@ -1,0 +1,49 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+
+@Controller('api/kota')
+export class KotaController {
+  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  private readonly client: ClientProxy;
+
+  @Get()
+  async getAlldata() {
+    const data = 'all';
+    return this.client.send('findAllKota', data);
+  }
+
+  @Get('/filter')
+  async filter(@Query() request: any) {
+    // return request;
+    return this.client.send('filterAllKota', request);
+  }
+
+  @Get('/:id')
+  async show(@Param('id') id: number) {
+    return this.client.send('findOneKota', id);
+  }
+
+  @Post()
+  async store(@Body() request: any) {
+    return this.client.send('createKota', request);
+  }
+
+  @Delete('/:id')
+  async destroy(@Param('id') id: number) {
+    return this.client.send('removeKota', id);
+  }
+  @Patch('/:id')
+  async update(@Param('id') id: number, @Body() data: any) {
+    data.id = id;
+    return this.client.send('updateKota', data);
+  }
+}
