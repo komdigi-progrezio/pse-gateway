@@ -16,6 +16,12 @@ export class ParsatuankerjaController {
     return this.client.send('filterPerAgency', id);
   }
 
+  @Get('/:id/parinstansi/dropdown')
+  async filterPerAgencyDropdown(@Param('id') id: number) {
+    // return 'asd';
+    return this.client.send('filterPerAgencyDropdown', id);
+  }
+
   @Post()
   async create(@Body() data: any) {
     return this.client.send('createParsatuankerja', data);

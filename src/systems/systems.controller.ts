@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 
 @Controller('api/systems')
@@ -14,5 +14,9 @@ export class SystemsController {
   @Get('/repository')
   async repositoryAll(@Query() request: any) {
     return this.client.send('repositorySystem', request);
+  }
+  @Get('/:id')
+  async findOne(@Param('id') id: number) {
+    return this.client.send('findOneSystem', id);
   }
 }
