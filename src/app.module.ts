@@ -10,9 +10,11 @@ import { ParconfigModule } from './parconfig/parconfig.module';
 import { ParinstansiController } from './parinstansi/parinstansi.controller';
 import { ApiModule } from './api/api.module';
 import { ParinstansiModule } from './parinstansi/parinstansi.module';
+import { ParsatuankerjaModule } from './parsatuankerja/parsatuankerja.module';
+import { SystemsModule } from './systems/systems.module';
 
 @Module({
-  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule, PublicModule, ParconfigModule, ApiModule, ParinstansiModule],
+  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule, PublicModule, ParconfigModule, ApiModule, ParinstansiModule, ParsatuankerjaModule, SystemsModule],
   controllers: [ParinstansiController],
 })
 export class AppModule {}

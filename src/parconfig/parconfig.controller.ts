@@ -27,6 +27,10 @@ export class ParconfigController {
   async categoryAllParConfig(@Query() request: any) {
     return this.client.send('categoryAllParConfig', request);
   }
+  @Get('/agency/group')
+  async Agencyparconfig() {
+    return this.client.send('Agencyparconfig', 'all');
+  }
   @Get('/groupby/category')
   async parConfigbyCategory() {
     return this.client.send('parConfigbyCategory', 'all');
