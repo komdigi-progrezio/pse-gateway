@@ -7,8 +7,10 @@ import {
   Query,
   Body,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
+import axios from 'axios';
 
 @Controller('api/users')
 export class UsersController {
@@ -16,8 +18,28 @@ export class UsersController {
   private readonly client: ClientProxy;
 
   @Get('/get/authenticated')
-  async authenti() {
-    return this.client.send('authUser', 'all');
+  async authenti(@Req() request: any) {
+    try {
+      const headers = request.headers;
+
+      const data = await axios.get(
+        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users?email=adminpse@kominfo.go.id`,
+        {
+          headers: {
+            Authorization: headers.authorization,
+          },
+        },
+      );
+
+      return this.client.send('authUser', data.data[0].username);
+    } catch (error) {
+      return {
+        status: 403,
+        message:
+          'Akun Anda Belum Aktif. Silahkan Tunggu Admin Untuk Menverifikasi Data Anda',
+        error,
+      };
+    }
   }
 
   @Get('/filter')
@@ -89,6 +111,15 @@ export class UsersController {
   @Post()
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
+  }
+
+  @Post('/logout')
+  async logout(@Query() data: any) {
+    const logout = await axios.post(
+      `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/logout`,
+    );
+
+    return data;
   }
 
   @Post('/notification-token')
