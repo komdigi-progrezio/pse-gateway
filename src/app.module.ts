@@ -12,9 +12,27 @@ import { ApiModule } from './api/api.module';
 import { ParinstansiModule } from './parinstansi/parinstansi.module';
 import { ParsatuankerjaModule } from './parsatuankerja/parsatuankerja.module';
 import { SystemsModule } from './systems/systems.module';
+import { RequestUpdateModule } from './request-update/request-update.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [UsersModule, RolesModule, PermissionsModule, ProvinsiModule, KotaModule, PublicModule, ParconfigModule, ApiModule, ParinstansiModule, ParsatuankerjaModule, SystemsModule],
+  imports: [
+    UsersModule,
+    RolesModule,
+    PermissionsModule,
+    ProvinsiModule,
+    KotaModule,
+    PublicModule,
+    ParconfigModule,
+    ApiModule,
+    ParinstansiModule,
+    ParsatuankerjaModule,
+    SystemsModule,
+    RequestUpdateModule,
+    JwtModule.register({
+      global: true,
+    }),
+  ],
   controllers: [ParinstansiController],
 })
 export class AppModule {}

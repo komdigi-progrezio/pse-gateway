@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import {
   Controller,
   Get,
@@ -14,6 +15,8 @@ import axios from 'axios';
 
 @Controller('api/users')
 export class UsersController {
+  constructor(private jwtService: JwtService) {}
+
   @Client({ transport: Transport.TCP, options: { port: 3001 } })
   private readonly client: ClientProxy;
 
@@ -22,16 +25,17 @@ export class UsersController {
     try {
       const headers = request.headers;
 
-      const data = await axios.get(
-        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users?email=adminpse@kominfo.go.id`,
-        {
-          headers: {
-            Authorization: headers.authorization,
-          },
-        },
-      );
+      const token = headers.authorization?.split(' ')[1];
 
-      return this.client.send('authUser', data.data[0].username);
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const decoded = await this.jwtService.decode(token);
+
+      const email = decoded.email;
+
+      return this.client.send('authUser', email);
     } catch (error) {
       return {
         status: 403,

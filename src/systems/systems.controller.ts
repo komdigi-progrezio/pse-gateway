@@ -11,6 +11,11 @@ export class SystemsController {
     return this.client.send('findAllSystems', 'all');
   }
 
+  @Get('/me/approved')
+  async approved() {
+    return [];
+  }
+
   @Get('/repository')
   async repositoryAll(@Query() request: any) {
     return this.client.send('repositorySystem', request);

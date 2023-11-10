@@ -11,6 +11,11 @@ export class ParsatuankerjaController {
     return this.client.send('filterAllParsatuankerja', request);
   }
 
+  @Get('/list/tree-view')
+  async treeView(){
+    return [];
+  }
+
   @Get('/:id/parinstansi')
   async filterPerAgency(@Param('id') id: number) {
     return this.client.send('filterPerAgency', id);
