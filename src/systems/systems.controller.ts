@@ -24,4 +24,13 @@ export class SystemsController {
   async findOne(@Param('id') id: number) {
     return this.client.send('findOneSystem', id);
   }
+
+  @Get('/filter/approved')
+  async filerApprove(@Query() request: any) {
+    return this.client.send('filterApproveSystem', request);
+  }
+  @Get('/filter/disapproved')
+  async filerDisApprove(@Query() request: any) {
+    return this.client.send('filterDisApproveSystem', request);
+  }
 }
