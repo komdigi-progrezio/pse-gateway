@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
+import * as querystring from 'querystring';
 
 @Controller('api/users')
 export class UsersController {
@@ -118,12 +119,36 @@ export class UsersController {
   }
 
   @Post('/logout')
-  async logout(@Query() data: any) {
-    const logout = await axios.post(
-      `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/logout`,
-    );
+  async logout(@Body() data: any) {
+    // return data;
 
-    return data;
+    try {
+      const payload = {
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        refresh_token: data.refresh_token,
+      };
+
+      const logout = await axios.post(
+        `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/logout`,
+        querystring.stringify(payload), // Mengonversi payload ke format x-www-form-urlencoded
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+
+      return {
+        status: 200,
+        message: 'Logged out successfully',
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: error,
+      };
+    }
   }
 
   @Post('/notification-token')
