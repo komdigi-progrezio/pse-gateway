@@ -14,6 +14,7 @@ import { ParsatuankerjaModule } from './parsatuankerja/parsatuankerja.module';
 import { SystemsModule } from './systems/systems.module';
 import { RequestUpdateModule } from './request-update/request-update.module';
 import { JwtModule } from '@nestjs/jwt';
+import { SpecialFunctionsModule } from './special-functions/special-functions.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
     }),
+    SpecialFunctionsModule,
   ],
   controllers: [ParinstansiController],
 })
