@@ -15,6 +15,8 @@ import { SystemsModule } from './systems/systems.module';
 import { RequestUpdateModule } from './request-update/request-update.module';
 import { JwtModule } from '@nestjs/jwt';
 import { SpecialFunctionsModule } from './special-functions/special-functions.module';
+import { ScopeModule } from './scope/scope.module';
+import { TypeOfServicesModule } from './type-of-services/type-of-services.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { SpecialFunctionsModule } from './special-functions/special-functions.mo
       global: true,
     }),
     SpecialFunctionsModule,
+    ScopeModule,
+    TypeOfServicesModule,
   ],
   controllers: [ParinstansiController],
 })
