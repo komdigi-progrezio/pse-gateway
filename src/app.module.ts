@@ -20,6 +20,7 @@ import { TypeOfServicesModule } from './type-of-services/type-of-services.module
 import { SecurityModule } from './security/security.module';
 import { RelatedModule } from './related/related.module';
 import { CertificateModule } from './certificate/certificate.module';
+import { ServiceUsersModule } from './service-users/service-users.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CertificateModule } from './certificate/certificate.module';
     SecurityModule,
     RelatedModule,
     CertificateModule,
+    ServiceUsersModule,
   ],
   controllers: [ParinstansiController],
 })
