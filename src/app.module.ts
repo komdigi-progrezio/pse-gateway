@@ -19,6 +19,7 @@ import { ScopeModule } from './scope/scope.module';
 import { TypeOfServicesModule } from './type-of-services/type-of-services.module';
 import { SecurityModule } from './security/security.module';
 import { RelatedModule } from './related/related.module';
+import { CertificateModule } from './certificate/certificate.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { RelatedModule } from './related/related.module';
     TypeOfServicesModule,
     SecurityModule,
     RelatedModule,
+    CertificateModule,
   ],
   controllers: [ParinstansiController],
 })
