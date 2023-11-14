@@ -18,6 +18,7 @@ import { SpecialFunctionsModule } from './special-functions/special-functions.mo
 import { ScopeModule } from './scope/scope.module';
 import { TypeOfServicesModule } from './type-of-services/type-of-services.module';
 import { SecurityModule } from './security/security.module';
+import { RelatedModule } from './related/related.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { SecurityModule } from './security/security.module';
     ScopeModule,
     TypeOfServicesModule,
     SecurityModule,
+    RelatedModule,
   ],
   controllers: [ParinstansiController],
 })
