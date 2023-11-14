@@ -17,6 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SpecialFunctionsModule } from './special-functions/special-functions.module';
 import { ScopeModule } from './scope/scope.module';
 import { TypeOfServicesModule } from './type-of-services/type-of-services.module';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { TypeOfServicesModule } from './type-of-services/type-of-services.module
     SpecialFunctionsModule,
     ScopeModule,
     TypeOfServicesModule,
+    SecurityModule,
   ],
   controllers: [ParinstansiController],
 })
