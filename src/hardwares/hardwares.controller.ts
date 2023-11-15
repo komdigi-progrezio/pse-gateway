@@ -14,10 +14,18 @@ export class HardwaresController {
   async createNetwork(@Body() body: any) {
     return this.client.send('createNetwork', body);
   }
+  @Post('/peripherals')
+  async createperipherals(@Body() body: any) {
+    return this.client.send('createPeripheral', body);
+  }
 
   @Delete('/networks/:id')
   async destroyNetworks(@Param('id') id: number) {
     return this.client.send('removeNetwork', id);
+  }
+  @Delete('/peripherals/:id')
+  async destroyPeripheral(@Param('id') id: number) {
+    return this.client.send('removePeripheral', id);
   }
   @Delete('/:id')
   async destroy(@Param('id') id: number) {
@@ -29,6 +37,12 @@ export class HardwaresController {
     body.id = id;
 
     return this.client.send('updateNetwork', body);
+  }
+  @Post('/peripherals/:id')
+  async updatePeripheral(@Body() body: any, @Param('id') id: number) {
+    body.id = id;
+
+    return this.client.send('updatePeripheral', body);
   }
 
   @Post('/:id')
