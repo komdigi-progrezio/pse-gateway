@@ -10,10 +10,25 @@ export class HardwaresController {
   async create(@Body() body: any) {
     return this.client.send('createHardware', body);
   }
+  @Post('/networks')
+  async createNetwork(@Body() body: any) {
+    return this.client.send('createNetwork', body);
+  }
 
+  @Delete('/networks/:id')
+  async destroyNetworks(@Param('id') id: number) {
+    return this.client.send('removeNetwork', id);
+  }
   @Delete('/:id')
   async destroy(@Param('id') id: number) {
     return this.client.send('removeHardware', id);
+  }
+
+  @Post('/networks/:id')
+  async updateNetwork(@Body() body: any, @Param('id') id: number) {
+    body.id = id;
+
+    return this.client.send('updateNetwork', body);
   }
 
   @Post('/:id')
