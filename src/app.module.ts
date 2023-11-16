@@ -22,6 +22,7 @@ import { RelatedModule } from './related/related.module';
 import { CertificateModule } from './certificate/certificate.module';
 import { ServiceUsersModule } from './service-users/service-users.module';
 import { HardwaresModule } from './hardwares/hardwares.module';
+import { SoftwaresModule } from './softwares/softwares.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { HardwaresModule } from './hardwares/hardwares.module';
     CertificateModule,
     ServiceUsersModule,
     HardwaresModule,
+    SoftwaresModule,
   ],
   controllers: [ParinstansiController],
 })
