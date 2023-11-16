@@ -25,6 +25,7 @@ import { HardwaresModule } from './hardwares/hardwares.module';
 import { SoftwaresModule } from './softwares/softwares.module';
 import { AvailabilityOfExpertsModule } from './availability-of-experts/availability-of-experts.module';
 import { ExpertsRequiredModule } from './experts-required/experts-required.module';
+import { LegalBasisModule } from './legal-basis/legal-basis.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ExpertsRequiredModule } from './experts-required/experts-required.modul
     SoftwaresModule,
     AvailabilityOfExpertsModule,
     ExpertsRequiredModule,
+    LegalBasisModule,
   ],
   controllers: [ParinstansiController],
 })
