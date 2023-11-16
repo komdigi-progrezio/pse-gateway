@@ -23,6 +23,7 @@ import { CertificateModule } from './certificate/certificate.module';
 import { ServiceUsersModule } from './service-users/service-users.module';
 import { HardwaresModule } from './hardwares/hardwares.module';
 import { SoftwaresModule } from './softwares/softwares.module';
+import { AvailabilityOfExpertsModule } from './availability-of-experts/availability-of-experts.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { SoftwaresModule } from './softwares/softwares.module';
     ServiceUsersModule,
     HardwaresModule,
     SoftwaresModule,
+    AvailabilityOfExpertsModule,
   ],
   controllers: [ParinstansiController],
 })
