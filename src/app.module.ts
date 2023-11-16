@@ -24,6 +24,7 @@ import { ServiceUsersModule } from './service-users/service-users.module';
 import { HardwaresModule } from './hardwares/hardwares.module';
 import { SoftwaresModule } from './softwares/softwares.module';
 import { AvailabilityOfExpertsModule } from './availability-of-experts/availability-of-experts.module';
+import { ExpertsRequiredModule } from './experts-required/experts-required.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AvailabilityOfExpertsModule } from './availability-of-experts/availabil
     HardwaresModule,
     SoftwaresModule,
     AvailabilityOfExpertsModule,
+    ExpertsRequiredModule,
   ],
   controllers: [ParinstansiController],
 })
