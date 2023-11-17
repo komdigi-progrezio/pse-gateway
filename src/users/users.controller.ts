@@ -55,8 +55,6 @@ export class UsersController {
     let data = request;
     data.roles = 'admin';
 
-    console.log(data);
-
     return this.client.send('findAllUsersFilter', data);
   }
 
