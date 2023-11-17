@@ -12,9 +12,9 @@ async function bootstrap() {
 
   const port = process.env.PORT || 8000;
 
-  // const multerConfig = {
-  //   dest: './uploads', // Ganti dengan direktori tempat menyimpan file
-  // };
+  const multerConfig = {
+    dest: './uploads', // Ganti dengan direktori tempat menyimpan file
+  };
 
   app.use(multer().any());
 

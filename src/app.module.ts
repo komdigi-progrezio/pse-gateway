@@ -28,6 +28,7 @@ import { ExpertsRequiredModule } from './experts-required/experts-required.modul
 import { LegalBasisModule } from './legal-basis/legal-basis.module';
 import { SopModule } from './sop/sop.module';
 import { HelpDeskModule } from './help-desk/help-desk.module';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { HelpDeskModule } from './help-desk/help-desk.module';
     LegalBasisModule,
     SopModule,
     HelpDeskModule,
+    DocumentModule,
   ],
   controllers: [ParinstansiController],
 })
