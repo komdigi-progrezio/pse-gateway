@@ -17,7 +17,10 @@ import {
 
 @Controller('api/scope')
 export class ScopeController {
-  @Client({ transport: Transport.TCP, options: { port: 3003 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Post()

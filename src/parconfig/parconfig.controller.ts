@@ -12,7 +12,10 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 
 @Controller('api/parconfig')
 export class ParconfigController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get()

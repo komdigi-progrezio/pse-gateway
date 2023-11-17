@@ -18,7 +18,10 @@ import * as querystring from 'querystring';
 export class UsersController {
   constructor(private jwtService: JwtService) {}
 
-  @Client({ transport: Transport.TCP, options: { port: 3001 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get('/get/authenticated')
