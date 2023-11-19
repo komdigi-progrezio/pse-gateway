@@ -1,9 +1,20 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/public')
 export class PublicController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get('/agency/group')
@@ -26,11 +37,13 @@ export class PublicController {
   //   }
 
   @Post('/pejabat')
+  @UseInterceptors(NoFilesInterceptor())
   async storePejabat(@Body() data: any) {
     return this.client.send('storePejabatPublic', data);
   }
 
   @Post('/provinsi')
+  @UseInterceptors(NoFilesInterceptor())
   async storePublicPropinsi(@Body() data: any) {
     return this.client.send('storePublicPropinsi', data);
   }

@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import {
   Controller,
   Get,
@@ -7,25 +8,54 @@ import {
   Query,
   Body,
   Delete,
+  Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
+import axios from 'axios';
+import * as querystring from 'querystring';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/users')
 export class UsersController {
-  @Client({ transport: Transport.TCP, options: { port: 3001 } })
+  constructor(private jwtService: JwtService) {}
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get('/get/authenticated')
-  async authenti() {
-    return this.client.send('authUser', 'all');
+  async authenti(@Req() request: any) {
+    try {
+      const headers = request.headers;
+
+      const token = headers.authorization?.split(' ')[1];
+
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const decoded = await this.jwtService.decode(token);
+
+      const email = decoded.email;
+
+      return this.client.send('authUser', email);
+    } catch (error) {
+      return {
+        status: 403,
+        message:
+          'Akun Anda Belum Aktif. Silahkan Tunggu Admin Untuk Menverifikasi Data Anda',
+        error,
+      };
+    }
   }
 
   @Get('/filter')
   async getAdminData(@Query() request: any) {
     let data = request;
     data.roles = 'admin';
-
-    console.log(data);
 
     return this.client.send('findAllUsersFilter', data);
   }
@@ -61,11 +91,13 @@ export class UsersController {
   }
 
   @Patch('/:id/profile')
+  @UseInterceptors(NoFilesInterceptor())
   async updateProfile(@Param('id') id: number, @Body() data: any) {
     data.id = id;
     return this.client.send('updateProfile', data);
   }
   @Patch('/approved/account/change')
+  @UseInterceptors(NoFilesInterceptor())
   async approvedAccountChange(@Body() data: any) {
     return this.client.send('approvedAccountChange', data);
   }
@@ -87,22 +119,60 @@ export class UsersController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
   }
 
+  @Post('/logout')
+  @UseInterceptors(NoFilesInterceptor())
+  async logout(@Body() data: any) {
+    // return data;
+
+    try {
+      const payload = {
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        refresh_token: data.refresh_token,
+      };
+
+      const logout = await axios.post(
+        `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/logout`,
+        querystring.stringify(payload), // Mengonversi payload ke format x-www-form-urlencoded
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+
+      return {
+        status: 200,
+        message: 'Logged out successfully',
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: error,
+      };
+    }
+  }
+
   @Post('/notification-token')
+  @UseInterceptors(NoFilesInterceptor())
   async notifToken(@Body() data: any) {
     return this.client.send('notifToken', data);
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() body: any) {
     body.id = id;
 
     return this.client.send('updateUser', body);
   }
   @Post('/parent/account')
+  @UseInterceptors(NoFilesInterceptor())
   async storeParent(@Param('id') id: number, @Body() body: any) {
     body.id = id;
 

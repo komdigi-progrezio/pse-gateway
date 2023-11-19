@@ -7,12 +7,17 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/kota')
 export class KotaController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get()
@@ -33,6 +38,7 @@ export class KotaController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async store(@Body() request: any) {
     return this.client.send('createKota', request);
   }
@@ -42,6 +48,7 @@ export class KotaController {
     return this.client.send('removeKota', id);
   }
   @Patch('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
     return this.client.send('updateKota', data);

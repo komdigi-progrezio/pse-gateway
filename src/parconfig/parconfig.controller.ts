@@ -9,10 +9,14 @@ import {
   Param,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/parconfig')
 export class ParconfigController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get()
@@ -36,6 +40,7 @@ export class ParconfigController {
     return this.client.send('parConfigbyCategory', 'all');
   }
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async createParconfig(@Body() data: any) {
     // return data;
     return this.client.send('createParconfig', data);

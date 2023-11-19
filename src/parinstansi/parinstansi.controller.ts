@@ -6,12 +6,17 @@ import {
   Post,
   Body,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/parinstansi')
 export class ParinstansiController {
-  @Client({ transport: Transport.TCP, options: { port: 3002 } })
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+  })
   private readonly client: ClientProxy;
 
   @Get()
@@ -24,6 +29,7 @@ export class ParinstansiController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
     return this.client.send('createParinstansi', data);
   }
