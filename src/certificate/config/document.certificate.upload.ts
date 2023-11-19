@@ -5,7 +5,7 @@ import { extname } from 'path';
 import * as uuid from 'uuid';
 
 export const multerConfig = {
-  dest: './uploads',
+  dest: './uploads/certificate',
 };
 
 function uuidRandom(file) {

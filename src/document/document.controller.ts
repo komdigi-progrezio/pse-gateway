@@ -9,10 +9,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 
-import { multerOptions } from './config/config.upload';
+import { multerOptions } from './config/document.config.upload';
 import * as uuid from 'uuid';
 
 @Controller('api/document')
@@ -24,6 +24,7 @@ export class DocumentController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
   uploadFile(@Body() body: any) {
     body.id = uuid.v4();
     return this.client.send('createDocument', body);
@@ -35,6 +36,7 @@ export class DocumentController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

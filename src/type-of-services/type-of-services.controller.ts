@@ -1,5 +1,13 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/type-of-services')
 export class TypeOfServicesController {
@@ -10,6 +18,7 @@ export class TypeOfServicesController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any) {
     return this.client.send('createTypeOfService', body);
   }
@@ -20,6 +29,7 @@ export class TypeOfServicesController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

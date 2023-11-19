@@ -1,5 +1,13 @@
-import { Body, Controller, Param, Post, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Delete,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/hardwares')
 export class HardwaresController {
@@ -10,14 +18,17 @@ export class HardwaresController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any) {
     return this.client.send('createHardware', body);
   }
   @Post('/networks')
+  @UseInterceptors(NoFilesInterceptor())
   async createNetwork(@Body() body: any) {
     return this.client.send('createNetwork', body);
   }
   @Post('/peripherals')
+  @UseInterceptors(NoFilesInterceptor())
   async createperipherals(@Body() body: any) {
     return this.client.send('createPeripheral', body);
   }
@@ -36,12 +47,14 @@ export class HardwaresController {
   }
 
   @Post('/networks/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async updateNetwork(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 
     return this.client.send('updateNetwork', body);
   }
   @Post('/peripherals/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async updatePeripheral(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 
@@ -49,6 +62,7 @@ export class HardwaresController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

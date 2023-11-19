@@ -6,8 +6,10 @@ import {
   Post,
   Body,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/parinstansi')
 export class ParinstansiController {
@@ -27,6 +29,7 @@ export class ParinstansiController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
     return this.client.send('createParinstansi', data);
   }

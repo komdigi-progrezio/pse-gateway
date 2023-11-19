@@ -1,5 +1,15 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from './config/document.certificate.upload';
 
 @Controller('api/certificate')
 export class CertificateController {
@@ -10,7 +20,13 @@ export class CertificateController {
   private readonly client: ClientProxy;
 
   @Post()
-  async create(@Body() body: any) {
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
+  async create(
+    @Body() body: any,
+    @UploadedFile() document: Express.Multer.File,
+  ) {
+    body.dokumen = document.filename;
+
     return this.client.send('createCertificate', body);
   }
 
@@ -20,6 +36,7 @@ export class CertificateController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

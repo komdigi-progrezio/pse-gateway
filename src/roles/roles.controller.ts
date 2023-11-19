@@ -7,8 +7,10 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/roles')
 export class RolesController {
@@ -29,11 +31,13 @@ export class RolesController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async store(@Body() body: any) {
     return this.client.send('createRole', body);
   }
 
   @Patch('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
     return this.client.send('updateRole', data);

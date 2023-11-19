@@ -1,5 +1,13 @@
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/security')
 export class SecurityController {
@@ -10,11 +18,13 @@ export class SecurityController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
     return this.client.send('createSecurity', data);
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
     return this.client.send('updateSecurity', data);

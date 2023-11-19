@@ -6,9 +6,11 @@ import {
   Post,
   Query,
   Delete,
+  UseInterceptors,
   Patch,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/provinsi')
 export class ProvinsiController {
@@ -41,6 +43,7 @@ export class ProvinsiController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
     return this.client.send('createProvinsi', data);
   }
@@ -51,6 +54,7 @@ export class ProvinsiController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
 

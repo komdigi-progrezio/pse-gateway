@@ -24,6 +24,7 @@ export class ScopeController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any) {
     // Lakukan sesuatu dengan files
     return this.client.send('createScope', body);

@@ -16,8 +16,6 @@ async function bootstrap() {
     dest: './uploads', // Ganti dengan direktori tempat menyimpan file
   };
 
-  app.use(multer().any());
-
   app.enableCors({
     origin: true,
   });

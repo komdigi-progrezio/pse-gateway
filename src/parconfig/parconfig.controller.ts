@@ -9,6 +9,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/parconfig')
 export class ParconfigController {
@@ -39,6 +40,7 @@ export class ParconfigController {
     return this.client.send('parConfigbyCategory', 'all');
   }
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async createParconfig(@Body() data: any) {
     // return data;
     return this.client.send('createParconfig', data);

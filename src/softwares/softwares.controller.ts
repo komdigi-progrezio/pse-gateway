@@ -1,5 +1,13 @@
-import { Controller, Post, Body, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Delete,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/softwares')
 export class SoftwaresController {
@@ -10,11 +18,13 @@ export class SoftwaresController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any) {
     return this.client.send('createSoftware', body);
   }
 
   @Post('/tools')
+  @UseInterceptors(NoFilesInterceptor())
   async createNetwork(@Body() body: any) {
     return this.client.send('createSoftwareTool', body);
   }
@@ -29,12 +39,14 @@ export class SoftwaresController {
   }
 
   @Post('/tools/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async updateNetwork(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 
     return this.client.send('updateSoftwareTool', body);
   }
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

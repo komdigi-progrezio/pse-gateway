@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/parsatuankerja')
 export class ParsatuankerjaController {
@@ -31,6 +40,7 @@ export class ParsatuankerjaController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
     return this.client.send('createParsatuankerja', data);
   }

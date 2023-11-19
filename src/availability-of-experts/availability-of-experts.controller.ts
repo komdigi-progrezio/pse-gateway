@@ -1,5 +1,13 @@
-import { Controller, Post, Body, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Delete,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/availability-of-experts')
 export class AvailabilityOfExpertsController {
@@ -10,6 +18,7 @@ export class AvailabilityOfExpertsController {
   private readonly client: ClientProxy;
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any) {
     return this.client.send('createAvailabilityOfExpert', body);
   }
@@ -20,6 +29,7 @@ export class AvailabilityOfExpertsController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 

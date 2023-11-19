@@ -9,10 +9,12 @@ import {
   Body,
   Delete,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import * as querystring from 'querystring';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/users')
 export class UsersController {
@@ -89,11 +91,13 @@ export class UsersController {
   }
 
   @Patch('/:id/profile')
+  @UseInterceptors(NoFilesInterceptor())
   async updateProfile(@Param('id') id: number, @Body() data: any) {
     data.id = id;
     return this.client.send('updateProfile', data);
   }
   @Patch('/approved/account/change')
+  @UseInterceptors(NoFilesInterceptor())
   async approvedAccountChange(@Body() data: any) {
     return this.client.send('approvedAccountChange', data);
   }
@@ -115,11 +119,13 @@ export class UsersController {
   }
 
   @Post()
+  @UseInterceptors(NoFilesInterceptor())
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
   }
 
   @Post('/logout')
+  @UseInterceptors(NoFilesInterceptor())
   async logout(@Body() data: any) {
     // return data;
 
@@ -153,17 +159,20 @@ export class UsersController {
   }
 
   @Post('/notification-token')
+  @UseInterceptors(NoFilesInterceptor())
   async notifToken(@Body() data: any) {
     return this.client.send('notifToken', data);
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() body: any) {
     body.id = id;
 
     return this.client.send('updateUser', body);
   }
   @Post('/parent/account')
+  @UseInterceptors(NoFilesInterceptor())
   async storeParent(@Param('id') id: number, @Body() body: any) {
     body.id = id;
 

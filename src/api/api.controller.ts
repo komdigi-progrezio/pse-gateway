@@ -1,5 +1,6 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Post, UseInterceptors } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api')
 export class ApiController {
@@ -10,6 +11,7 @@ export class ApiController {
   private readonly client: ClientProxy;
 
   @Post('/setup/admin/coy')
+  @UseInterceptors(NoFilesInterceptor())
   async setupAdmin() {
     return this.client.send('setupAdmin', 'all');
   }
