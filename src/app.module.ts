@@ -29,6 +29,7 @@ import { LegalBasisModule } from './legal-basis/legal-basis.module';
 import { SopModule } from './sop/sop.module';
 import { HelpDeskModule } from './help-desk/help-desk.module';
 import { DocumentModule } from './document/document.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -44,6 +45,9 @@ import { DocumentModule } from './document/document.module';
     ParsatuankerjaModule,
     SystemsModule,
     RequestUpdateModule,
+    CacheModule.register({ 
+      isGlobal: true 
+    }),
     JwtModule.register({
       global: true,
     }),
