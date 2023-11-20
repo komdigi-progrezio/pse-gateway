@@ -43,9 +43,9 @@ export class UsersController {
 
       const decoded = await this.jwtService.decode(token);
       const email = decoded.email;
-      const cacheData = await this.getCachedData(token, email);
+      const responseCached = await this.getCachedData(token, email);
 
-      return this.client.send('authUser', email);
+      return responseCached;
     } catch (error) {
       return {
         status: 403,
@@ -192,10 +192,9 @@ export class UsersController {
     let cacheData = await this.cacheService.get(email);
     if(cacheData === undefined){
       const ssoData = await this.fetchDataFromSso(token, email);
-      const userData = await this.client.send('findAllUsersFilter', {email:email}).toPromise();
-
+      const userData = await this.client.send('authUser', email).toPromise();
       if(userData && ssoData) {
-        cacheData = userData.data[0] || null
+        cacheData = userData || null
         this.cacheData(email, cacheData, ssoData.exp);
       }
     }
