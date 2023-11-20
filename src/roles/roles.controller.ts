@@ -36,7 +36,7 @@ export class RolesController {
     return this.client.send('createRole', body);
   }
 
-  @Patch('/:id')
+  @Post('/:id')
   @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;
