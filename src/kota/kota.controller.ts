@@ -47,7 +47,7 @@ export class KotaController {
   async destroy(@Param('id') id: number) {
     return this.client.send('removeKota', id);
   }
-  @Patch('/:id')
+  @Post('/:id')
   @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() data: any) {
     data.id = id;

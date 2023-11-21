@@ -42,10 +42,10 @@ export class ParconfigController {
   @Post()
   @UseInterceptors(NoFilesInterceptor())
   async createParconfig(@Body() data: any) {
-    // return data;
     return this.client.send('createParconfig', data);
   }
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Param('id') id: number, @Body() request: any) {
     request.id = id;
 
