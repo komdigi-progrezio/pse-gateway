@@ -94,6 +94,13 @@ export class UsersController {
     return this.client.send('newManager', id);
   }
 
+  @Post('/:id/official')
+  @UseInterceptors(NoFilesInterceptor())
+  async updateUser(@Param('id') id: number, @Body() data: any) {
+    data.id = id;
+    return this.client.send('updateProfile', data);
+  }
+
   @Patch('/:id/profile')
   @UseInterceptors(NoFilesInterceptor())
   async updateProfile(@Param('id') id: number, @Body() data: any) {
