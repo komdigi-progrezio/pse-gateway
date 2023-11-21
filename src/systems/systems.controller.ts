@@ -1,5 +1,14 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Post,
+  UseInterceptors,
+  Body,
+} from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/systems')
 export class SystemsController {
@@ -35,5 +44,18 @@ export class SystemsController {
   @Get('/filter/disapproved')
   async filerDisApprove(@Query() request: any) {
     return this.client.send('filterDisApproveSystem', request);
+  }
+
+  @Get('/:id/edit')
+  async findEdit(@Param('id') id: number) {
+    return this.client.send('findEditSystem', id);
+  }
+
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(@Body() body: any, @Param('id') id: number) {
+    body.id = id;
+
+    return this.client.send('updateSystem', body);
   }
 }
