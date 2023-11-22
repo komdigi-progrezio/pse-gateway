@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   UseInterceptors,
+  Delete,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
@@ -38,10 +39,22 @@ export class ParsatuankerjaController {
     // return 'asd';
     return this.client.send('filterPerAgencyDropdown', id);
   }
-
   @Post()
   @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
+    // return data;
     return this.client.send('createParsatuankerja', data);
+  }
+
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(@Param('id') id: number, @Body() data: any) {
+    data.id = id;
+    return this.client.send('updateParsatuankerja', data);
+  }
+
+  @Delete('/:id')
+  async destroy(@Param('id') id: number) {
+    return this.client.send('removeParsatuankerja', id);
   }
 }

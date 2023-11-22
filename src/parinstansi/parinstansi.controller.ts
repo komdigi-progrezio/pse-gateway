@@ -34,6 +34,13 @@ export class ParinstansiController {
     return this.client.send('createParinstansi', data);
   }
 
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(@Param('id') id: number, @Body() data: any) {
+    data.id = id;
+    return this.client.send('updateParinstansi', data);
+  }
+
   @Get('/filter/approved')
   async getDataApproved(@Query() request: any) {
     return this.client.send('getDataApproved', request);

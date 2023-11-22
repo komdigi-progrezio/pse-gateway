@@ -28,7 +28,6 @@ export class ProvinsiController {
 
   @Get('/filter')
   async filter(@Query() request: any) {
-    console.log(this.client.send('filterProvinsi', request));
     return this.client.send('filterProvinsi', request);
   }
 
