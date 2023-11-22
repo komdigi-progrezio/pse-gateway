@@ -29,6 +29,14 @@ export class ScopeController {
     // Lakukan sesuatu dengan files
     return this.client.send('createScope', body);
   }
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(@Body() body: any, @Param('id') id: number) {
+    body.id = id;
+
+    return this.client.send('updateScope', body);
+  }
+
   @Delete('/:id')
   async destryoy(@Param('id') id: number) {
     return this.client.send('removeScope', id);
