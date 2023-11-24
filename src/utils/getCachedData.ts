@@ -49,17 +49,21 @@ export class getCachedData {
   }
 
   private async fetchDataFromSso(token: string, email: string): Promise<any> {
-    const url = `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`;
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        email: email,
-      },
-    });
+    try {
+      const url = `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          email: email,
+        },
+      });
 
-    return response?.data[0] || null;
+      return response?.data[0] || null;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async cacheData(
