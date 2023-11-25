@@ -1,7 +1,18 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Controller, Get, Inject, Req, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Req,
+  Query,
+  Body,
+  Post,
+  UseInterceptors,
+  Param,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { Cache } from 'cache-manager';
 import { getCachedData } from 'src/utils/getCachedData';
 
@@ -50,5 +61,34 @@ export class ReportController {
   statistics() {
     const data = 'statisticReport';
     return this.client.send('statisticsReport', data);
+  }
+
+  @Get('/:id')
+  async findOne(@Param('id') id: number) {
+    return this.client.send('findOneReport', id);
+  }
+
+  @Post()
+  @UseInterceptors(NoFilesInterceptor())
+  async create(@Body() data: any, @Req() request: any) {
+    try {
+      const headers = request.headers;
+      const token = headers.authorization?.split(' ')[1];
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+      const decoded = await cacheData.getDecodedToken(token);
+
+      const responseCached = await cacheData.account(token, decoded.email);
+
+      data.account_id = responseCached?.data?.id;
+
+      return this.client.send('createReport', data);
+    } catch (error) {
+      return error;
+    }
   }
 }
