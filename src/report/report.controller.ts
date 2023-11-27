@@ -9,6 +9,7 @@ import {
   Post,
   UseInterceptors,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
@@ -90,5 +91,10 @@ export class ReportController {
     } catch (error) {
       return error;
     }
+  }
+
+  @Delete('/:id')
+  async destroy(@Param('id') id: number) {
+    return this.client.send('removeReport', id);
   }
 }
