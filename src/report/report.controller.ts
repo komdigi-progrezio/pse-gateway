@@ -92,6 +92,34 @@ export class ReportController {
       return error;
     }
   }
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(
+    @Param('id') id: number,
+    @Body() data: any,
+    @Req() request: any,
+  ) {
+    try {
+      const headers = request.headers;
+      const token = headers.authorization?.split(' ')[1];
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+      const decoded = await cacheData.getDecodedToken(token);
+
+      const responseCached = await cacheData.account(token, decoded.email);
+
+      data.account_id = responseCached?.data?.id;
+      data.id = id;
+
+      return this.client.send('updateReport', data);
+    } catch (error) {
+      return error;
+    }
+  }
 
   @Delete('/:id')
   async destroy(@Param('id') id: number) {
