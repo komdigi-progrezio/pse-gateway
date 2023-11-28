@@ -30,6 +30,7 @@ import { SopModule } from './sop/sop.module';
 import { HelpDeskModule } from './help-desk/help-desk.module';
 import { DocumentModule } from './document/document.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     SopModule,
     HelpDeskModule,
     DocumentModule,
+    ReportModule,
   ],
   controllers: [ParinstansiController],
 })

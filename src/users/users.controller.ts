@@ -10,7 +10,8 @@ import {
   Delete,
   Req,
   UseInterceptors,
-  Inject, Injectable,
+  Inject,
+  Injectable,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
@@ -18,12 +19,15 @@ import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import axios from 'axios';
 import * as querystring from 'querystring';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { getCachedData } from 'src/utils/getCachedData';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
 export class UsersController {
-
-  constructor(private jwtService: JwtService, @Inject(CACHE_MANAGER) private cacheService: Cache) {}
+  constructor(
+    private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
+  ) {}
 
   @Client({
     transport: Transport.TCP,
@@ -71,10 +75,26 @@ export class UsersController {
     return this.client.send('findAllUsersFilter', data);
   }
   @Get('/filter/officiallog')
-  async getDataLog(@Query() request: any) {
+  async getDataLog(@Query() data: any, @Req() request: any) {
     // return request;
-    const data = request;
-    return this.client.send('findAllUsers', data);
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+    const decoded = await cacheData.getDecodedToken(token);
+
+    const responseCached = await cacheData.account(token, decoded.email);
+
+    const account_id = responseCached?.data?.id || null;
+
+    data.account_id = account_id;
+
+    return this.client.send('findAllUsersLog', data);
   }
   @Get('/change')
   async changeUser(@Query() request: any) {
@@ -184,9 +204,7 @@ export class UsersController {
   }
   @Post('/parent/account')
   @UseInterceptors(NoFilesInterceptor())
-  async storeParent(@Param('id') id: number, @Body() body: any) {
-    body.id = id;
-
+  async storeParent(@Body() body: any) {
     return this.client.send('storeParent', body);
   }
 
@@ -197,15 +215,16 @@ export class UsersController {
 
   private async getCachedData(token: string, email: string): Promise<any> {
     let cacheData = await this.cacheService.get(email);
-    if(cacheData === undefined){
+    if (cacheData === undefined) {
       const ssoData = await this.fetchDataFromSso(token, email);
       const userData = await this.client.send('authUser', email).toPromise();
-      if(userData && ssoData) {
-        cacheData = userData || null
+      if (userData && ssoData) {
+        cacheData = userData || null;
         this.cacheData(email, cacheData, ssoData.exp);
+        this.getCachedData(token, email);
       }
     }
-    return cacheData; 
+    return cacheData;
   }
 
   private async fetchDataFromSso(token: string, email: string): Promise<any> {
@@ -222,7 +241,11 @@ export class UsersController {
     return response?.data[0] || null;
   }
 
-  async cacheData(email: string, data: any, keycloakExp: number): Promise<void> {
+  async cacheData(
+    email: string,
+    data: any,
+    keycloakExp: number,
+  ): Promise<void> {
     const currentTime = Math.floor(Date.now() / 1000);
     const timeUntilExp = keycloakExp - currentTime;
 

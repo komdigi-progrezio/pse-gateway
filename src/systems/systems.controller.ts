@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   Controller,
   Get,
@@ -5,13 +6,24 @@ import {
   Query,
   Post,
   UseInterceptors,
+  Req,
   Body,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+
+import { Inject } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { getCachedData } from 'src/utils/getCachedData';
 
 @Controller('api/systems')
 export class SystemsController {
+  constructor(
+    private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
+  ) {}
+
   @Client({
     transport: Transport.TCP,
     options: { port: +process.env.PSE_CORE_SERVICE_PORT },
@@ -24,8 +36,23 @@ export class SystemsController {
   }
 
   @Get('/me/approved')
-  async approved() {
-    return [];
+  async approved(@Req() request: any) {
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+    const decoded = await cacheData.getDecodedToken(token);
+
+    const responseCached = await cacheData.account(token, decoded.email);
+
+    const account_id = responseCached?.data?.id || null;
+
+
+    return this.client.send('meApprovedSystem', account_id);
   }
 
   @Get('/repository')

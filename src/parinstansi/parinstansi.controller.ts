@@ -27,6 +27,10 @@ export class ParinstansiController {
   async findOne(@Param('id') id: number) {
     return this.client.send('findOneParinstansi', id);
   }
+  @Get('/list/tree-view')
+  async listTreeView(@Query() request: any) {
+    return this.client.send('listTreeView', request);
+  }
 
   @Post()
   @UseInterceptors(NoFilesInterceptor())
