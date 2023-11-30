@@ -42,4 +42,38 @@ export class StorageController {
       };
     }
   }
+  @Get('/statistics/:name')
+  getFileAndDeleteStatistics(
+    @Param('name') fileName: string,
+    @Res() res: Response,
+  ) {
+    const pathName = 'temp/' + fileName;
+
+    try {
+      if (!fs.existsSync(pathName)) {
+        throw new NotFoundException('File tidak ditemukan');
+      }
+
+      // Menggunakan res.download untuk mengirim file sebagai respons
+      res.download(pathName, fileName, async (err: any) => {
+        if (err) {
+          console.error(err);
+          res.status(err.status).end();
+        } else {
+          // Hapus file setelah dikirim sebagai respons
+          try {
+            await fs.promises.unlink(pathName);
+            console.log(`File '${fileName}' telah dihapus.`);
+          } catch (error) {
+            console.error(`Gagal menghapus file '${fileName}':`, error);
+          }
+        }
+      });
+    } catch (error) {
+      return {
+        status: 500,
+        error: 'Error: ' + error,
+      };
+    }
+  }
 }

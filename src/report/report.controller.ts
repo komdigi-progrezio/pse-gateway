@@ -15,13 +15,16 @@ import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { Cache } from 'cache-manager';
+import { error } from 'console';
 import { getCachedData } from 'src/utils/getCachedData';
+import { ReportService } from './report.service';
 
 @Controller('api/report')
 export class ReportController {
   constructor(
     private jwtService: JwtService,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
+    readonly reportService: ReportService,
   ) {}
   @Client({
     transport: Transport.TCP,
@@ -59,9 +62,12 @@ export class ReportController {
   }
 
   @Get('/statistics')
-  statistics() {
-    const data = 'statisticReport';
-    return this.client.send('statisticsReport', data);
+  async statistics() {
+    const data = await this.client
+      .send('statisticsReport', 'Alldata')
+      .toPromise();
+
+    return this.reportService.statistic(data);
   }
 
   @Get('/:id')
