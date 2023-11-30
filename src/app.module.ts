@@ -33,6 +33,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ReportModule } from './report/report.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { StorageModule } from './storage/storage.module';
+import { NotifikasiModule } from './notifikasi/notifikasi.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { StorageModule } from './storage/storage.module';
     ReportModule,
     DashboardModule,
     StorageModule,
+    NotifikasiModule,
   ],
   controllers: [ParinstansiController],
 })
