@@ -31,6 +31,8 @@ import { HelpDeskModule } from './help-desk/help-desk.module';
 import { DocumentModule } from './document/document.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ReportModule } from './report/report.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -68,6 +70,8 @@ import { ReportModule } from './report/report.module';
     HelpDeskModule,
     DocumentModule,
     ReportModule,
+    DashboardModule,
+    StorageModule,
   ],
   controllers: [ParinstansiController],
 })
