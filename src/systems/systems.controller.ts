@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   Req,
   Body,
+  Patch,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
@@ -51,7 +52,6 @@ export class SystemsController {
 
     const account_id = responseCached?.data?.id || null;
 
-
     return this.client.send('meApprovedSystem', account_id);
   }
 
@@ -84,5 +84,12 @@ export class SystemsController {
     body.id = id;
 
     return this.client.send('updateSystem', body);
+  }
+
+  @Patch('/approved/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async approve(@Param('id') id: number, @Body() body: any) {
+    // return id;
+    return this.client.send('approveSystem', id);
   }
 }
