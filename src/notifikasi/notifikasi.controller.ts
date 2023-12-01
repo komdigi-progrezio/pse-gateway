@@ -15,7 +15,7 @@ export class NotifikasiController {
   ) {}
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_AUDIT_SERVICE_PORT },
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
   })
   private readonly client: ClientProxy;
 

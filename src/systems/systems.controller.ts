@@ -45,10 +45,8 @@ export class SystemsController {
     }
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
-    const decoded = await cacheData.getDecodedToken(token);
-
-    const responseCached = await cacheData.account(token, decoded.email);
+    const responseCached = await cacheData.account(token);
+    console.log(responseCached);
 
     const account_id = responseCached?.data?.id || null;
 
