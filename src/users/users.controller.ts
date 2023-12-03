@@ -147,11 +147,11 @@ export class UsersController {
       id,
     };
     if (status === 'enable' || status === 'disable') {
-      const resp = await firstValueFrom(await this.client.send('changeStatusUser', request));
+      const resp = await firstValueFrom(this.client.send('changeStatusUser', request));
       if (status === 'enable'){
-        const user = await firstValueFrom(await this.client.send('findOneUser', id));
+        const user = await firstValueFrom(this.client.send('findOneUser', id));
         // send email notification
-        await firstValueFrom(await this.notificationClient.send('pejabatPendaftarAktivasi', user.data.username));
+        await firstValueFrom(this.notificationClient.send('pejabatPendaftarAktivasi', user.data.username));
       }
       return resp;
     }
