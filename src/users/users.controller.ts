@@ -20,6 +20,7 @@ import axios from 'axios';
 import * as querystring from 'querystring';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -34,6 +35,12 @@ export class UsersController {
     options: { port: +process.env.PSE_USER_SERVICE_PORT },
   })
   private readonly client: ClientProxy;
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+  })
+  private readonly notificationClient: ClientProxy; 
 
   @Get('/get/authenticated')
   async authenti(@Req() request: any) {
@@ -140,7 +147,13 @@ export class UsersController {
       id,
     };
     if (status === 'enable' || status === 'disable') {
-      return this.client.send('changeStatusUser', request);
+      const resp = await firstValueFrom(await this.client.send('changeStatusUser', request));
+      if (status === 'enable'){
+        const user = await firstValueFrom(await this.client.send('findOneUser', id));
+        // send email notification
+        await firstValueFrom(await this.notificationClient.send('pejabatPendaftarAktivasi', user.data.username));
+      }
+      return resp;
     }
   }
 
