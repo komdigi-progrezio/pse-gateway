@@ -62,4 +62,26 @@ export class ReportService {
       status: 200,
     };
   }
+
+  async excel(dataResponse: any) {
+    const { content, account_id, name, id, data } = dataResponse;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Data');
+
+    data.forEach((element) => {
+      worksheet.addRow(element);
+    });
+
+    // Menggunakan Stream untuk menyimpan file Excel
+    const timestamp = formattedDate();
+    const filePath = `Layanan_${timestamp}.xlsx`;
+    const tempFilePath = `temp/${filePath}`;
+
+    await workbook.xlsx.writeFile(tempFilePath);
+
+    return {
+      path: process.env.APP_DOMAIN + '/api/storage/statistics/' + filePath,
+      status: 200,
+    };
+  }
 }
