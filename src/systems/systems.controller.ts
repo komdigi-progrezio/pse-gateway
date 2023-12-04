@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('api/systems')
 export class SystemsController {
@@ -30,6 +31,12 @@ export class SystemsController {
     options: { port: +process.env.PSE_CORE_SERVICE_PORT },
   })
   private readonly client: ClientProxy;
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+  })
+  private readonly clientNotification: ClientProxy;
 
   @Get()
   async findAll() {
@@ -82,8 +89,13 @@ export class SystemsController {
   @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
+    const resp = await firstValueFrom(this.client.send('updateSystem', body));
+    
+    const system = await firstValueFrom(this.client.send('findOneSystem', id))
+    await firstValueFrom(this.clientNotification.send('pendaftaranSeBaru', system))
+    await firstValueFrom(this.clientNotification.send('systemRegistration', system))
 
-    return this.client.send('updateSystem', body);
+    return resp
   }
 
   @Patch('/approved/:id')
