@@ -93,6 +93,7 @@ export class SystemsController {
     
     const system = await firstValueFrom(this.client.send('findOneSystem', id))
     await firstValueFrom(this.clientNotification.send('pendaftaranSeBaru', system))
+    await firstValueFrom(this.clientNotification.send('systemRegistration', system))
 
     return resp
   }
