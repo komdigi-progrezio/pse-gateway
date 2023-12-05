@@ -218,7 +218,15 @@ export class UsersController {
   @Post('/parent/account')
   @UseInterceptors(NoFilesInterceptor())
   async storeParent(@Body() body: any) {
-    return this.client.send('storeParent', body);
+    const resp = await firstValueFrom(this.client.send('storeParent', body));
+    if (resp.id !== undefined && resp.id != 0) {
+        const user = await firstValueFrom(this.client.send('findOneUser', resp.id));
+        // send email notification
+        await firstValueFrom(this.notificationClient.send('pendaftaranSubPejabat', user.data));
+    }
+
+    delete resp.id;
+    return resp;
   }
 
   @Delete('/:id')
