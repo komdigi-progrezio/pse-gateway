@@ -91,10 +91,11 @@ export class SystemsController {
     body.id = id;
     const resp = await firstValueFrom(this.client.send('updateSystem', body));
     
-    const system = await firstValueFrom(this.client.send('findOneSystem', id))
-    await firstValueFrom(this.clientNotification.send('pendaftaranSeBaru', system))
-    await firstValueFrom(this.clientNotification.send('systemRegistration', system))
-
+    if (resp.status !== undefined && resp.status == 200) {
+      const system = await firstValueFrom(this.client.send('findOneSystem', id))
+      await firstValueFrom(this.clientNotification.send('pendaftaranSeBaru', system.data))
+      await firstValueFrom(this.clientNotification.send('systemRegistration', system.data))
+    }
     return resp
   }
 
@@ -102,6 +103,13 @@ export class SystemsController {
   @UseInterceptors(NoFilesInterceptor())
   async approve(@Param('id') id: number, @Body() body: any) {
     // return id;
-    return this.client.send('approveSystem', id);
+    const resp = await firstValueFrom(this.client.send('approveSystem', id));
+
+    if (resp.status !== undefined && resp.status == 200) {
+      const system = await firstValueFrom(this.client.send('findOneSystem', id))
+      await firstValueFrom(this.clientNotification.send('systemRegistrationApproved', system.data))      
+    }
+    
+    return resp
   }
 }

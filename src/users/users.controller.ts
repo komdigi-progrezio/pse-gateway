@@ -148,7 +148,7 @@ export class UsersController {
     };
     if (status === 'enable' || status === 'disable') {
       const resp = await firstValueFrom(this.client.send('changeStatusUser', request));
-      if (status === 'enable'){
+      if (resp.status !== undefined && resp.status == 200 && status === 'enable') {
         const user = await firstValueFrom(this.client.send('findOneUser', id));
         // send email notification
         await firstValueFrom(this.notificationClient.send('pejabatPendaftarAktivasi', user.data.username));
