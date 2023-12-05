@@ -77,6 +77,19 @@ export class ReportService {
     const filePath = `Layanan_${timestamp}.xlsx`;
     const tempFilePath = `temp/${filePath}`;
 
+    const cell = worksheet.getRow(1);
+
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+    cell.font = {
+      bold: true,
+      size: 20,
+    };
+
     await workbook.xlsx.writeFile(tempFilePath);
 
     return {
