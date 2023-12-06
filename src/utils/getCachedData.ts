@@ -26,11 +26,13 @@ export class getCachedData {
 
   async getDecodedToken(token: any) {
     const decoded = await this.jwtService.decode(token);
-
     return decoded;
   }
 
-  async account(token: string, email: string): Promise<any> {
+  async account(token: string): Promise<any> {
+    const decoded = await this.getDecodedToken(token);
+    const email = decoded.email;
+
     let cacheData = await this.cacheService.get(email);
 
     if (cacheData === undefined) {
@@ -41,7 +43,7 @@ export class getCachedData {
       if (userData && ssoData) {
         cacheData = userData || null;
         this.cacheData(email, cacheData, ssoData.exp).then(() => {
-          this.account(token, email);
+          this.account(token);
         });
       }
     }

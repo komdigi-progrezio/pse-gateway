@@ -47,10 +47,7 @@ export class ReportController {
       }
 
       const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
-      const decoded = await cacheData.getDecodedToken(token);
-
-      const responseCached = await cacheData.account(token, decoded.email);
+      const responseCached = await cacheData.account(token);
 
       const data: any = {};
       data.user = responseCached;
@@ -110,10 +107,7 @@ export class ReportController {
       }
 
       const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
-      const decoded = await cacheData.getDecodedToken(token);
-
-      const responseCached = await cacheData.account(token, decoded.email);
+      const responseCached = await cacheData.account(token);
 
       data.account_id = responseCached?.data?.id;
 
@@ -137,10 +131,7 @@ export class ReportController {
       }
 
       const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
-      const decoded = await cacheData.getDecodedToken(token);
-
-      const responseCached = await cacheData.account(token, decoded.email);
+      const responseCached = await cacheData.account(token);
 
       data.account_id = responseCached?.data?.id;
       data.id = id;
