@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Query, Res } from '@nestjs/common';
+import { Controller, Get, Inject, Query, Req, Res } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { DashboardService } from './dashboard.service';
 import { getCachedData } from 'src/utils/getCachedData';
@@ -25,10 +25,10 @@ export class DashboardController {
   }
 
   @Get('/chart/system/electronic')
-  async chartSystemElectronic(@Query() request: any) {
+  async chartSystemElectronic(@Query() request: any, @Req() req) {
     const data: any = {};
 
-    const headers = request.headers;
+    const headers = req.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
       return { message: 'Unauthorized' };
@@ -43,6 +43,7 @@ export class DashboardController {
     data.user = responseCached?.data;
 
     request.user = data.user;
+    // return request;
 
     return this.client.send('chartSystemElectronicDashboard', request);
   }

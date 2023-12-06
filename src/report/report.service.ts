@@ -68,6 +68,14 @@ export class ReportService {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
 
+    //   // Gabungkan kolom header dinamis
+    // const startMergedCell = 'A1';
+    // const endMergedCell = String.fromCharCode(
+    //   startMergedCell.charCodeAt(0) + mergedColumnCount - 1
+    // ) + '1';
+    // worksheet.mergeCells(`${startMergedCell}:${endMergedCell}`);
+    // worksheet.getCell(startMergedCell).value = 'Merged Header';
+
     data.forEach((element) => {
       worksheet.addRow(element);
     });
@@ -87,7 +95,7 @@ export class ReportService {
     };
     cell.font = {
       bold: true,
-      size: 20,
+      size: 14,
     };
 
     await workbook.xlsx.writeFile(tempFilePath);
