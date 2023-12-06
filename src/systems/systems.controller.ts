@@ -53,7 +53,7 @@ export class SystemsController {
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
     const responseCached = await cacheData.account(token);
-    console.log(responseCached);
+    // console.log(responseCached);
 
     const account_id = responseCached?.data?.id || null;
 
