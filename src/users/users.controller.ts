@@ -52,9 +52,8 @@ export class UsersController {
         return { message: 'Unauthorized' };
       }
 
-      const decoded = await this.jwtService.decode(token);
-      const email = decoded.email;
-      const responseCached = await this.getCachedData(token, email);
+      const cacheData = new getCachedData(this.jwtService, this.cacheService);
+      const responseCached = await cacheData.account(token);
 
       return responseCached;
     } catch (error) {
@@ -92,10 +91,7 @@ export class UsersController {
     }
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
-    const decoded = await cacheData.getDecodedToken(token);
-
-    const responseCached = await cacheData.account(token, decoded.email);
+    const responseCached = await cacheData.account(token);
 
     const account_id = responseCached?.data?.id || null;
 
@@ -232,44 +228,5 @@ export class UsersController {
   @Delete('/:id')
   async destroy(@Param('id') id: number) {
     return this.client.send('removeUser', id);
-  }
-
-  private async getCachedData(token: string, email: string): Promise<any> {
-    let cacheData = await this.cacheService.get(email);
-    if (cacheData === undefined) {
-      const ssoData = await this.fetchDataFromSso(token, email);
-      const userData = await this.client.send('authUser', email).toPromise();
-      if (userData && ssoData) {
-        cacheData = userData || null;
-        this.cacheData(email, cacheData, ssoData.exp);
-        this.getCachedData(token, email);
-      }
-    }
-    return cacheData;
-  }
-
-  private async fetchDataFromSso(token: string, email: string): Promise<any> {
-    const url = `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`;
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        email: email,
-      },
-    });
-
-    return response?.data[0] || null;
-  }
-
-  async cacheData(
-    email: string,
-    data: any,
-    keycloakExp: number,
-  ): Promise<void> {
-    const currentTime = Math.floor(Date.now() / 1000);
-    const timeUntilExp = keycloakExp - currentTime;
-
-    await this.cacheService.set(email, data, timeUntilExp);
   }
 }
