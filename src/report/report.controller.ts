@@ -67,6 +67,30 @@ export class ReportController {
     return this.reportService.statistic(data);
   }
 
+  @Get('/excel/:id')
+  async excel(@Param('id') id: number, @Req() request: any) {
+    const data: any = {};
+    data.id = id;
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+    const decoded = await cacheData.getDecodedToken(token);
+
+    const responseCached = await cacheData.account(token, decoded.email);
+
+    data.user = responseCached?.data;
+
+    const report = await this.client.send('excelReport', data).toPromise();
+    // return await report;
+
+    return await this.reportService.excel(report);
+  }
+
   @Get('/:id')
   async findOne(@Param('id') id: number) {
     return this.client.send('findOneReport', id);
