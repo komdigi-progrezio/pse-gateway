@@ -36,9 +36,7 @@ export class DashboardController {
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
 
-    const decoded = await cacheData.getDecodedToken(token);
-
-    const responseCached = await cacheData.account(token, decoded.email);
+    const responseCached = await cacheData.account(token);
 
     data.user = responseCached?.data;
 
