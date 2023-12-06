@@ -68,6 +68,44 @@ export class ReportService {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
 
+    let startColumnCharCode = 'A'.charCodeAt(0);
+
+    content.forEach((element, key) => {
+      if (key < 8) {
+        const columnLength = element.field.length;
+
+        let endColumnCharCode = startColumnCharCode + columnLength - 1;
+        let startColumnLetter = String.fromCharCode(startColumnCharCode);
+        let endColumnLetter = '';
+
+        if (endColumnCharCode > 'Z'.charCodeAt(0)) {
+          // Menangani jika melebihi kolom 'Z'
+          const firstLetterCode =
+            Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
+          startColumnCharCode = firstLetterCode;
+          endColumnCharCode =
+            ((endColumnCharCode - 1) % 26) + 'A'.charCodeAt(0);
+          endColumnLetter = String.fromCharCode(endColumnCharCode);
+        } else {
+          endColumnLetter = String.fromCharCode(endColumnCharCode);
+        }
+
+        const startMergedCell = startColumnLetter + '1';
+        const endMergedCell = endColumnLetter + '1';
+        const mergedRange = `${startMergedCell}:${endMergedCell}`;
+
+        console.log(mergedRange);
+
+        worksheet.mergeCells(mergedRange);
+        worksheet.getCell(startMergedCell).value = element.table.replace(
+          'Sis',
+          '',
+        );
+
+        startColumnCharCode = endColumnCharCode + 1;
+      }
+    });
+
     data.forEach((element) => {
       worksheet.addRow(element);
     });
@@ -76,6 +114,19 @@ export class ReportService {
     const timestamp = formattedDate();
     const filePath = `Layanan_${timestamp}.xlsx`;
     const tempFilePath = `temp/${filePath}`;
+
+    const cell = worksheet.getRow(1);
+
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+    cell.font = {
+      bold: true,
+      size: 14,
+    };
 
     await workbook.xlsx.writeFile(tempFilePath);
 

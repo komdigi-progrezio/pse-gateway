@@ -53,7 +53,7 @@ export class SystemsController {
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
     const responseCached = await cacheData.account(token);
-    console.log(responseCached);
+    // console.log(responseCached);
 
     const account_id = responseCached?.data?.id || null;
 
@@ -88,13 +88,25 @@ export class SystemsController {
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
     const resp = await firstValueFrom(this.client.send('updateSystem', body));
-    
+
     if (resp.status !== undefined && resp.status == 200) {
-      const system = await firstValueFrom(this.client.send('findOneSystem', id))
-      await firstValueFrom(this.clientNotification.send('pendaftaranSeBaru', system.data))
-      await firstValueFrom(this.clientNotification.send('systemRegistration', system.data))
+      const system = await firstValueFrom(
+        this.client.send('findOneSystem', id),
+      );
+      await firstValueFrom(
+        this.clientNotification.send('pendaftaranSeBaru', system.data),
+      );
+      await firstValueFrom(
+        this.clientNotification.send('systemRegistration', system.data),
+      );
     }
-    return resp
+    return resp;
+  }
+
+  @Patch('/approved/publish/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async approvePublish(@Param('id') id: number) {
+    return this.client.send('approvePublishSystem', id);
   }
 
   @Patch('/approved/:id')
@@ -104,10 +116,14 @@ export class SystemsController {
     const resp = await firstValueFrom(this.client.send('approveSystem', id));
 
     if (resp.status !== undefined && resp.status == 200) {
-      const system = await firstValueFrom(this.client.send('findOneSystem', id))
-      await firstValueFrom(this.clientNotification.send('systemRegistrationApproved', system.data))      
+      const system = await firstValueFrom(
+        this.client.send('findOneSystem', id),
+      );
+      await firstValueFrom(
+        this.clientNotification.send('systemRegistrationApproved', system.data),
+      );
     }
-    
-    return resp
+
+    return resp;
   }
 }
