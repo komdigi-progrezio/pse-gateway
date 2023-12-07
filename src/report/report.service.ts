@@ -72,7 +72,7 @@ export class ReportService {
 
     content.forEach((element, key) => {
       if (key < 8) {
-        const columnLength = element.field.length;
+        const columnLength = element.field ? element.field.length : 1;
 
         let endColumnCharCode = startColumnCharCode + columnLength - 1;
         let startColumnLetter = String.fromCharCode(startColumnCharCode);
