@@ -8,7 +8,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from './config/public.config.upload';
 
 @Controller('api/public')
 export class PublicController {
@@ -43,7 +44,7 @@ export class PublicController {
   }
 
   @Post('/pejabat')
-  @UseInterceptors(NoFilesInterceptor())
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
   async storePejabat(@Body() data: any) {
     return this.client.send('storePejabatPublic', data);
   }
