@@ -17,7 +17,7 @@ function uuidRandom(file) {
 
 export const multerOptions = {
   filefilter: (req: any, file: any, cb: any) => {
-    if (file.mimetype.match(/\/(jpg|jpeg|png|gif|pdf)$/)) {
+    if (file.mimetype.match(/\/(pdf)$/)) {
       cb(null, true); //allow storage of file
     } else {
       cb(
