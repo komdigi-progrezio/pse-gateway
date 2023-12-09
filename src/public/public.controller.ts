@@ -4,10 +4,12 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from './config/public.config.upload';
 
 @Controller('api/public')
 export class PublicController {
@@ -17,8 +19,13 @@ export class PublicController {
   })
   private readonly client: ClientProxy;
 
-  @Get('/agency/group')
+  @Get('parconfig/agency/group')
   async publicparconfig() {
+    const data = 'all';
+    return this.client.send('Publicparconfig', data);
+  }
+  @Get('/agency/group')
+  async publicparconfigagency() {
     const data = 'all';
     return this.client.send('Publicparconfig', data);
   }
@@ -31,13 +38,13 @@ export class PublicController {
   async filterPublickotaPerProvince(@Param('id') id: number) {
     return this.client.send('filterPublickotaPerProvince', id);
   }
-  //   @Get('/parinstansi/filter')
-  //   async filterPublickotaPerProvince(@Param('id') id: number) {
-  //     return this.client.send('filterPublickotaPerProvince', id);
-  //   }
+  @Get('/parinstansi/filter')
+  async filterParinstansi(@Query() request: any) {
+    return this.client.send('filterParinstansi', request);
+  }
 
   @Post('/pejabat')
-  @UseInterceptors(NoFilesInterceptor())
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
   async storePejabat(@Body() data: any) {
     return this.client.send('storePejabatPublic', data);
   }
