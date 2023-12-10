@@ -84,6 +84,7 @@ export class ReportController {
     data.user = responseCached?.data;
 
     const report = await this.client.send('excelReport', data).toPromise();
+    console.log(report);
     // return await report;
 
     return await this.reportService.excel(report);

@@ -69,10 +69,14 @@ export class ReportService {
     const worksheet = workbook.addWorksheet('Data');
 
     let startColumnCharCode = 'A'.charCodeAt(0);
+    let endLetterKe = 0;
+    let startLetterKe = 0;
+    let startMergedCell;
+    let endMergedCell;
 
     content.forEach((element, key) => {
       if (element.field) {
-        if (key < 8) {
+        if (key <= 9) {
           const columnLength = element.field ? element.field.length : 1;
 
           let endColumnCharCode = startColumnCharCode + columnLength - 1;
@@ -81,21 +85,44 @@ export class ReportService {
 
           if (endColumnCharCode > 'Z'.charCodeAt(0)) {
             // Menangani jika melebihi kolom 'Z'
-            const firstLetterCode =
-              Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
-            startColumnCharCode = firstLetterCode;
-            endColumnCharCode =
-              ((endColumnCharCode - 1) % 26) + 'A'.charCodeAt(0);
-            endColumnLetter = String.fromCharCode(endColumnCharCode);
+            if (startColumnLetter.charCodeAt(0) <= 'Z'.charCodeAt(0)) {
+              const firstLetterCode =
+                Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
+              console.log(
+                'startColumnCharCode',
+                String.fromCharCode(firstLetterCode),
+              );
+              startColumnCharCode = firstLetterCode;
+
+              endColumnCharCode =
+                Math.floor((endColumnCharCode - 1) / 26) +
+                'A'.charCodeAt(0) -
+                1;
+              endColumnLetter = String.fromCharCode(endColumnCharCode);
+              endLetterKe++;
+            }
           } else {
             endColumnLetter = String.fromCharCode(endColumnCharCode);
           }
 
-          const startMergedCell = startColumnLetter + '1';
-          const endMergedCell = endColumnLetter + '1';
+          console.log(endLetterKe);
+
+          if (startLetterKe > 0 && endLetterKe > 0) {
+            startMergedCell = 'A' + startColumnLetter + '1';
+            endMergedCell = 'A' + endColumnLetter + '1';
+          } else if (endLetterKe > 0) {
+            if (startLetterKe === 0) {
+              startLetterKe++;
+            }
+            startMergedCell = startColumnLetter + '1';
+            endMergedCell = 'A' + endColumnLetter + '1';
+          } else {
+            startMergedCell = startColumnLetter + '1';
+            endMergedCell = endColumnLetter + '1';
+          }
           const mergedRange = `${startMergedCell}:${endMergedCell}`;
 
-          console.log(mergedRange);
+          console.log(`${key} => `, mergedRange);
 
           worksheet.mergeCells(mergedRange);
           worksheet.getCell(startMergedCell).value = element.table.replace(
