@@ -64,6 +64,11 @@ export class SystemsController {
   async repositoryAll(@Query() request: any) {
     return this.client.send('repositorySystem', request);
   }
+  @Get('/general')
+  async generalSystem(@Query() request: any) {
+    return this.client.send('generalSystem', request);
+  }
+
   @Get('/:id')
   async findOne(@Param('id') id: number) {
     return this.client.send('findOneSystem', id);
