@@ -54,4 +54,10 @@ export class PublicController {
   async storePublicPropinsi(@Body() data: any) {
     return this.client.send('storePublicPropinsi', data);
   }
+
+  @Post('/parinstansi')
+  @UseInterceptors(NoFilesInterceptor())
+  async create(@Body() data: any) {
+    return this.client.send('createParinstansi', data);
+  }
 }
