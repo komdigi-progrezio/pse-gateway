@@ -52,6 +52,8 @@ export class PublicController {
       .send('storePejabatPublic', data)
       .toPromise();
 
+    console.log(response);
+
     if (response.status === 500) {
       return res.status(502).send(response);
     } else {

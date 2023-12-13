@@ -40,7 +40,7 @@ export class UsersController {
     transport: Transport.TCP,
     options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
   })
-  private readonly notificationClient: ClientProxy; 
+  private readonly notificationClient: ClientProxy;
 
   @Get('/get/authenticated')
   async authenti(@Req() request: any) {
@@ -142,13 +142,26 @@ export class UsersController {
       status,
       id,
     };
+
     if (status === 'enable' || status === 'disable') {
-      const resp = await firstValueFrom(this.client.send('changeStatusUser', request));
-      if (resp.status !== undefined && resp.status == 200 && status === 'enable') {
+      const resp = await firstValueFrom(
+        this.client.send('changeStatusUser', request),
+      );
+      if (
+        resp.status !== undefined &&
+        resp.status == 200 &&
+        status === 'enable'
+      ) {
         const user = await firstValueFrom(this.client.send('findOneUser', id));
         // send email notification
-        await firstValueFrom(this.notificationClient.send('pejabatPendaftarAktivasi', user.data.username));
+        await firstValueFrom(
+          this.notificationClient.send(
+            'pejabatPendaftarAktivasi',
+            user.data.username,
+          ),
+        );
       }
+
       return resp;
     }
   }
@@ -216,9 +229,13 @@ export class UsersController {
   async storeParent(@Body() body: any) {
     const resp = await firstValueFrom(this.client.send('storeParent', body));
     if (resp.id !== undefined && resp.id != 0) {
-        const user = await firstValueFrom(this.client.send('findOneUser', resp.id));
-        // send email notification
-        await firstValueFrom(this.notificationClient.send('pendaftaranSubPejabat', user.data));
+      const user = await firstValueFrom(
+        this.client.send('findOneUser', resp.id),
+      );
+      // send email notification
+      await firstValueFrom(
+        this.notificationClient.send('pendaftaranSubPejabat', user.data),
+      );
     }
 
     delete resp.id;
