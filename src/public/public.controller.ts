@@ -6,10 +6,12 @@ import {
   Post,
   Query,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './config/public.config.upload';
+import { Response } from 'express';
 
 @Controller('api/public')
 export class PublicController {
@@ -45,8 +47,16 @@ export class PublicController {
 
   @Post('/pejabat')
   @UseInterceptors(FileInterceptor('dokumen', multerOptions))
-  async storePejabat(@Body() data: any) {
-    return this.client.send('storePejabatPublic', data);
+  async storePejabat(@Body() data: any, @Res() res: Response) {
+    const response = await this.client
+      .send('storePejabatPublic', data)
+      .toPromise();
+
+    if (response.status === 500) {
+      return res.status(502).send(response);
+    } else {
+      return res.status(201).send(response);
+    }
   }
 
   @Post('/provinsi')
