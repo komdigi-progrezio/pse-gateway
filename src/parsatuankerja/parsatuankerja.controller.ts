@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -7,12 +8,24 @@ import {
   Query,
   UseInterceptors,
   Delete,
+  Inject,
+  Req,
+  Res,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Cache } from 'cache-manager';
+import { Response, response } from 'express';
+import { getCachedData } from 'src/utils/getCachedData';
 
 @Controller('api/parsatuankerja')
 export class ParsatuankerjaController {
+  constructor(
+    private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
+  ) {}
+
   @Client({
     transport: Transport.TCP,
     options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
@@ -25,8 +38,28 @@ export class ParsatuankerjaController {
   }
 
   @Get('/list/tree-view')
-  async treeView() {
-    return [];
+  async treeView(@Req() request: any, @Res() res: Response) {
+    try {
+      const headers = request.headers;
+      const token = headers.authorization?.split(' ')[1];
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const cacheData = new getCachedData(this.jwtService, this.cacheService);
+      const responseCached = await cacheData.account(token);
+
+      const responseData = await this.client
+        .send('treeParsatuankerja', responseCached.data.id)
+        .toPromise();
+
+      return res.status(200).send(responseData);
+    } catch (error) {
+      return res.status(500).send({
+        status: 500,
+        message: error,
+      });
+    }
   }
 
   @Get('/:id/parinstansi')

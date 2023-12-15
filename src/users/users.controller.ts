@@ -153,6 +153,7 @@ export class UsersController {
         status === 'enable'
       ) {
         const user = await firstValueFrom(this.client.send('findOneUser', id));
+
         // send email notification
         await firstValueFrom(
           this.notificationClient.send(
