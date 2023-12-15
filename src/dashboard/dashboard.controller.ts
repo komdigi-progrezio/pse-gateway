@@ -20,8 +20,22 @@ export class DashboardController {
   private readonly client: ClientProxy;
 
   @Get('/widget')
-  async widget() {
-    return this.client.send('cardWidgetDashboard', 'all');
+  async widget(@Query() request: any, @Req() req) {
+    const data: any = {};
+
+    const headers = req.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    data.user = responseCached?.data;
+    request.user = data.user;
+
+    return this.client.send('cardWidgetDashboard', request);
   }
 
   @Get('/chart/system/electronic')
@@ -35,13 +49,10 @@ export class DashboardController {
     }
 
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
-
     const responseCached = await cacheData.account(token);
 
     data.user = responseCached?.data;
-
     request.user = data.user;
-    // return request;
 
     return this.client.send('chartSystemElectronicDashboard', request);
   }
