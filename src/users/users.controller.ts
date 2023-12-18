@@ -167,6 +167,11 @@ export class UsersController {
     }
   }
 
+  @Get('/dropdown')
+  async dropdown(@Query() request: any) {
+    return this.client.send('dropdownUser', request);
+  }
+
   @Get('/:id')
   async viewData(@Param('id') id: number, @Query() request: any) {
     return this.client.send('findOneUser', id);
@@ -177,7 +182,6 @@ export class UsersController {
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
   }
-
 
   @Post('/logout')
   @UseInterceptors(NoFilesInterceptor())
