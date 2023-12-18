@@ -124,7 +124,7 @@ export class UsersController {
     return this.client.send('updateProfile', data);
   }
 
-  @Patch('/:id/profile')
+  @Post('/:id/profile')
   @UseInterceptors(NoFilesInterceptor())
   async updateProfile(@Param('id') id: number, @Body() data: any) {
     data.id = id;
@@ -165,6 +165,11 @@ export class UsersController {
 
       return resp;
     }
+  }
+
+  @Get('/dropdown')
+  async dropdown(@Query() request: any) {
+    return this.client.send('dropdownUser', request);
   }
 
   @Get('/:id')
