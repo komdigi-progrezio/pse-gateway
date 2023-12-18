@@ -35,7 +35,7 @@ export class getCachedData {
 
     let cacheData = await this.cacheService.get(email);
 
-    // if (cacheData === undefined) {
+    if (!cacheData) {
       const ssoData = await this.fetchDataFromSso(token, email);
       const userData = await this.client.send('authUser', email).toPromise();
 
@@ -45,7 +45,7 @@ export class getCachedData {
           this.account(token);
         });
       }
-    // }
+    }
     return cacheData;
   }
 
