@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pse-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pse-gateway
+  template:
+    metadata:
+      labels:
+        app: pse-gateway
+    spec:
+      containers:
+      - name: pse-gateway
+        image: pse/pse-gateway:latest
+        ports:
+        - containerPort: 8000

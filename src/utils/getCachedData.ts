@@ -35,9 +35,8 @@ export class getCachedData {
 
     let cacheData = await this.cacheService.get(email);
 
-    if (cacheData === undefined) {
+    // if (cacheData === undefined) {
       const ssoData = await this.fetchDataFromSso(token, email);
-
       const userData = await this.client.send('authUser', email).toPromise();
 
       if (userData && ssoData) {
@@ -46,13 +45,14 @@ export class getCachedData {
           this.account(token);
         });
       }
-    }
+    // }
     return cacheData;
   }
 
   private async fetchDataFromSso(token: string, email: string): Promise<any> {
     try {
-      const url = `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`;
+      //admin/realms/SPBE/users
+      const url = `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/userinfo`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ export class getCachedData {
         },
       });
 
-      return response?.data[0] || null;
+      return response?.data || null;
     } catch (error) {
       console.log(error);
     }
