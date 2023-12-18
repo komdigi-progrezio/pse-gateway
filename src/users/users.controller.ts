@@ -124,7 +124,7 @@ export class UsersController {
     return this.client.send('updateProfile', data);
   }
 
-  @Patch('/:id/profile')
+  @Post('/:id/profile')
   @UseInterceptors(NoFilesInterceptor())
   async updateProfile(@Param('id') id: number, @Body() data: any) {
     data.id = id;
@@ -177,6 +177,7 @@ export class UsersController {
   async store(@Body() body: any) {
     return this.client.send('createUser', body);
   }
+
 
   @Post('/logout')
   @UseInterceptors(NoFilesInterceptor())
