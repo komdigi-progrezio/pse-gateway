@@ -34,6 +34,7 @@ import { ReportModule } from './report/report.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { StorageModule } from './storage/storage.module';
 import { NotifikasiModule } from './notifikasi/notifikasi.module';
+import { PersonInChargeModule } from './person-in-charge/person-in-charge.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { NotifikasiModule } from './notifikasi/notifikasi.module';
     DashboardModule,
     StorageModule,
     NotifikasiModule,
+    PersonInChargeModule,
   ],
   controllers: [ParinstansiController],
 })

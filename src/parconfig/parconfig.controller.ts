@@ -33,7 +33,7 @@ export class ParconfigController {
   }
   @Get('/agency/group')
   async Agencyparconfig() {
-    return this.client.send('Agencyparconfig', 'all');
+    return this.client.send('getAgencyGroup', 'all');
   }
   @Get('/groupby/category')
   async parConfigbyCategory() {

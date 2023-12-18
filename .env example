@@ -14,5 +14,6 @@ PSE_CORE_SERVICE_PORT=8003
 PSE_NOTIFICATION_SERVICE_PORT=8004
 
 APP_DOMAIN=http://127.0.0.1:3000
+# APP_DOMAIN=http://pse.portalpelayananpublic.id
 
-KEYCLOACK_DOMAIN = https://sso-dev.layanan.go.id/auth
+KEYCLOACK_DOMAIN=https://sso.layanan.go.id

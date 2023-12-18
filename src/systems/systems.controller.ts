@@ -9,6 +9,7 @@ import {
   Req,
   Body,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
@@ -131,4 +132,10 @@ export class SystemsController {
 
     return resp;
   }
+
+  @Delete('/:id')
+  async destroy(@Param('id') id: number) {
+    return this.client.send('removeSystem', id);
+  }
+
 }
