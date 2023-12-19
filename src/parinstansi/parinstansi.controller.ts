@@ -7,6 +7,7 @@ import {
   Body,
   Delete,
   UseInterceptors,
+  Patch,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
@@ -52,6 +53,11 @@ export class ParinstansiController {
   @Get('/not/approved')
   async getDataNot(@Query() request: any) {
     return this.client.send('getDataNot', request);
+  }
+
+  @Patch('/approved/:id')
+  async approvedParinstansi(@Param('id') id: number) {
+    return this.client.send('approvedParinstansi', id);
   }
 
   @Delete('/:id')
