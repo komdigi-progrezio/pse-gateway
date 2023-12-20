@@ -76,7 +76,20 @@ export class SystemsController {
   }
 
   @Get('/filter/approved')
-  async filerApprove(@Query() request: any) {
+  async filerApprove(@Query() request: any, @Req() req: any) {
+    const headers = req.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const account = responseCached?.data || null;
+
+    request.account = account;
+
     return this.client.send('filterApproveSystem', request);
   }
   @Get('/filter/disapproved')
