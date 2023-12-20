@@ -89,6 +89,24 @@ export class SystemsController {
     return this.client.send('findEditSystem', id);
   }
 
+  @Post()
+  @UseInterceptors(NoFilesInterceptor())
+  async create(@Req() request: any, @Body() body: any) {
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const account_id = responseCached?.data?.id || null;
+
+    body.account_id = account_id;
+    return this.client.send('createSystem', body);
+  }
+
   @Post('/:id')
   @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
@@ -137,5 +155,4 @@ export class SystemsController {
   async destroy(@Param('id') id: number) {
     return this.client.send('removeSystem', id);
   }
-
 }
