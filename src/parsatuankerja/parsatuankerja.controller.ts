@@ -82,7 +82,6 @@ export class ParsatuankerjaController {
   @Post('/organization')
   @UseInterceptors(NoFilesInterceptor())
   async createOrganization(@Body() data: any) {
-    console.log('dsdads');
     return this.client.send('createOrganization', data);
   }
 
