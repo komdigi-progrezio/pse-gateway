@@ -44,6 +44,14 @@ export class PublicController {
   async filterParinstansi(@Query() request: any) {
     return this.client.send('filterParinstansi', request);
   }
+  @Get('/certificate/:id')
+  async sealid(@Param('id') id: number) {
+    return this.client.send('sealidPublic', id);
+  }
+  @Get('/certificate/find/:id')
+  async certificateFindData(@Param('id') id: number) {
+    return this.client.send('certificateFindDataPublic', id);
+  }
 
   @Post('/pejabat')
   @UseInterceptors(FileInterceptor('dokumen', multerOptions))
