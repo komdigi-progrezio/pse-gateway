@@ -35,6 +35,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { StorageModule } from './storage/storage.module';
 import { NotifikasiModule } from './notifikasi/notifikasi.module';
 import { PersonInChargeModule } from './person-in-charge/person-in-charge.module';
+import { OrganizersModule } from './organizers/organizers.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { PersonInChargeModule } from './person-in-charge/person-in-charge.module
     StorageModule,
     NotifikasiModule,
     PersonInChargeModule,
+    OrganizersModule,
   ],
   controllers: [ParinstansiController],
 })
