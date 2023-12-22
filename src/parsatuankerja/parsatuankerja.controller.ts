@@ -11,6 +11,7 @@ import {
   Inject,
   Req,
   Res,
+  Patch,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
@@ -92,6 +93,13 @@ export class ParsatuankerjaController {
     const responseCached = await cacheData.account(token);
     const payload = { data: data, user_id: responseCached.data.id }
     return this.client.send('createOrganization', payload);
+  }
+
+  @Patch('/organization/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async updateOrganization(@Param('id') id: number, @Body() data: any) {
+    const request = { id, data };
+    return this.client.send('updateOrganization', request);
   }
 
   @Post('/:id')
