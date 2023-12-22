@@ -113,4 +113,10 @@ export class ParsatuankerjaController {
   async destroy(@Param('id') id: number) {
     return this.client.send('removeParsatuankerja', id);
   }
+
+  @Get('/:id')
+  async findOneParsatuankerja(@Param('id') id: number) {
+    return this.client.send('findOneParsatuankerja', id);
+  }
+
 }
