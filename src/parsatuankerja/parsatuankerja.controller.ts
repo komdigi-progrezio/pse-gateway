@@ -81,8 +81,17 @@ export class ParsatuankerjaController {
 
   @Post('/organization')
   @UseInterceptors(NoFilesInterceptor())
-  async createOrganization(@Body() data: any) {
-    return this.client.send('createOrganization', data);
+  async createOrganization(@Req() request: any, @Body() data: any) {
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+    const payload = { data: data, user_id: responseCached.data.id }
+    return this.client.send('createOrganization', payload);
   }
 
   @Post('/:id')
