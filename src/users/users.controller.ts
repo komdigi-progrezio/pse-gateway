@@ -106,10 +106,25 @@ export class UsersController {
     return this.client.send('findChangeUsersFilter', data);
   }
   @Get('/parent/account')
-  async parent(@Query() request: any) {
-    // return request;
-    const data = request;
-    return this.client.send('parentUserFilter', data);
+  async parent(@Query() data: any, @Req() request: any) {
+    if (data.parent_id) {
+      return this.client.send('parentUserFilter', data);
+    } else {
+      const headers = request.headers;
+      const token = headers.authorization?.split(' ')[1];
+      if (!token) {
+        return { message: 'Unauthorized' };
+      }
+
+      const cacheData = new getCachedData(this.jwtService, this.cacheService);
+      const responseCached = await cacheData.account(token);
+
+      const parent_id = responseCached?.data?.id || null;
+
+      data.parent_id = parent_id;
+
+      return this.client.send('parentUserFilter', data);
+    }
   }
 
   @Get('/new/manager/:id')
@@ -232,7 +247,20 @@ export class UsersController {
   }
   @Post('/parent/account')
   @UseInterceptors(NoFilesInterceptor())
-  async storeParent(@Body() body: any) {
+  async storeParent(@Body() body: any, @Req() request: any) {
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const account_id = responseCached?.data?.id || null;
+
+    body.account_id = account_id;
+
     const resp = await firstValueFrom(this.client.send('storeParent', body));
     if (resp.id !== undefined && resp.id != 0) {
       const user = await firstValueFrom(
