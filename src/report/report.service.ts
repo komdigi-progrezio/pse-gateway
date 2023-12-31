@@ -77,7 +77,7 @@ export class ReportService {
 
     content.forEach((element, key) => {
       if (element.field) {
-        if (key <= 15) {
+        if (key <= 16) {
           const columnLength = element.field ? element.field.length : 1;
 
           let endColumnCharCode = startColumnCharCode + columnLength - 1;
@@ -109,8 +109,14 @@ export class ReportService {
           console.log(endLetterKe);
 
           if (startLetterKe > 0 && endLetterKe > 0) {
-            startMergedCell = 'A' + startColumnLetter + '1';
-            endMergedCell = 'A' + endColumnLetter + '1';
+            startMergedCell =
+              String.fromCharCode('A'.charCodeAt(0) + startLetterKe - 1) +
+              startColumnLetter +
+              '1';
+            endMergedCell =
+              String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
+              endColumnLetter +
+              '1';
           } else if (endLetterKe > 0) {
             if (startLetterKe === 0) {
               startLetterKe++;
