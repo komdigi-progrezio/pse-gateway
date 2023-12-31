@@ -65,6 +65,7 @@ export class ReportService {
 
   async excel(dataResponse: any) {
     const { content, account_id, name, id, data } = dataResponse;
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Data');
 
@@ -76,7 +77,7 @@ export class ReportService {
 
     content.forEach((element, key) => {
       if (element.field) {
-        if (key <= 14) {
+        if (key <= 15) {
           const columnLength = element.field ? element.field.length : 1;
 
           let endColumnCharCode = startColumnCharCode + columnLength - 1;
