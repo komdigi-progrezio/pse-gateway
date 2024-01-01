@@ -77,7 +77,7 @@ export class ReportService {
 
     content.forEach((element, key) => {
       if (element.field) {
-        if (key <= 16) {
+        if (key <= 18) {
           const columnLength = element.field ? element.field.length : 1;
 
           let endColumnCharCode = startColumnCharCode + columnLength - 1;
@@ -106,6 +106,7 @@ export class ReportService {
             endColumnLetter = String.fromCharCode(endColumnCharCode);
           }
 
+          console.log(startLetterKe);
           console.log(endLetterKe);
 
           if (startLetterKe > 0 && endLetterKe > 0) {
@@ -117,12 +118,18 @@ export class ReportService {
               String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
               endColumnLetter +
               '1';
+            if (startLetterKe === endLetterKe - 1) {
+              startLetterKe++;
+            }
           } else if (endLetterKe > 0) {
-            if (startLetterKe === 0) {
+            if (startLetterKe === endLetterKe - 1) {
               startLetterKe++;
             }
             startMergedCell = startColumnLetter + '1';
-            endMergedCell = 'A' + endColumnLetter + '1';
+            endMergedCell =
+              String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
+              endColumnLetter +
+              '1';
           } else {
             startMergedCell = startColumnLetter + '1';
             endMergedCell = endColumnLetter + '1';
