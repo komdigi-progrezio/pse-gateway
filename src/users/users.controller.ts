@@ -16,7 +16,7 @@ import {
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import * as querystring from 'querystring';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
@@ -152,13 +152,53 @@ export class UsersController {
   }
 
   @Patch('/:status/:id')
-  async enableUsers(@Param('id') id: number, @Param('status') status: string) {
-    const request = {
-      status,
-      id,
-    };
+  async enableUsers(
+    @Param('id') id: number,
+    @Param('status') status: string,
+    @Req() req: any,
+  ) {
+    const headers = req.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
 
     if (status === 'enable' || status === 'disable') {
+      const user = await firstValueFrom(this.client.send('findOneUser', id));
+      let keycloakId: string;
+      if (status === 'enable') {
+        const existUser = await this.getUserByEmail(user.data.username, token);
+        if (!existUser) {
+          const data = {
+            firstName: user.data.nama,
+            email: user.data.username,
+            enabled: true,
+            username: user.data.username,
+            credentials: [
+              {
+                type: 'password',
+                value: user.data.username,
+                temporary: true,
+              },
+            ],
+          };
+          if (user.data.is_admin) {
+            data['groups'] = ['Admin'];
+          }
+          const newUserResp = await this.createUser(data, token);
+          const existUser = await this.getUserByEmail(user.data.username,token);
+          keycloakId = existUser.id;
+        } else {
+          keycloakId = existUser.id;
+        }
+      }
+
+      const request = {
+        status,
+        id,
+        keycloakId,
+      };
+
       const resp = await firstValueFrom(
         this.client.send('changeStatusUser', request),
       );
@@ -167,8 +207,6 @@ export class UsersController {
         resp.status == 200 &&
         status === 'enable'
       ) {
-        const user = await firstValueFrom(this.client.send('findOneUser', id));
-
         // send email notification
         await firstValueFrom(
           this.notificationClient.send(
@@ -180,7 +218,6 @@ export class UsersController {
 
       return resp;
     }
-    // return this.client.send('changeStatusUser', request);
   }
 
   @Get('/dropdown')
@@ -281,4 +318,51 @@ export class UsersController {
   async destroy(@Param('id') id: number) {
     return this.client.send('removeUser', id);
   }
+
+  private async getUserByEmail(
+    email: string,
+    bearerToken: string,
+  ): Promise<any> {
+    const config: AxiosRequestConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      params: {
+        email: email,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`,
+        config,
+      );
+      const userData = response.data;
+      return userData.length > 0 ? userData[0] : null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async createUser(data: any, bearerToken: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+
+    try {
+      const response = await axios.post(
+        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`,
+        data,
+        config,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
