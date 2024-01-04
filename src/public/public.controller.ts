@@ -12,6 +12,7 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './config/public.config.upload';
 import { Response } from 'express';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('api/public')
 export class PublicController {
@@ -20,6 +21,18 @@ export class PublicController {
     options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
   })
   private readonly client: ClientProxy;
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+  })
+  private readonly clientNotification: ClientProxy;
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+  })
+  private readonly clientUser: ClientProxy;
 
   @Get('parconfig/agency/group')
   async publicparconfig() {
@@ -65,6 +78,21 @@ export class PublicController {
     if (response.status === 500) {
       return res.status(502).send(response);
     } else {
+      if (response.account_id) {
+        const user = await firstValueFrom(
+          this.clientUser.send('findOneUser', response.account_id),
+        );
+
+        if (data.status_register == '1') {
+          await firstValueFrom(
+            this.clientNotification.send('pejabatPendaftarBaru', user.data),
+          );
+        } else {
+          await firstValueFrom(
+            this.clientNotification.send('pejabatPendaftarPengganti', user.data),
+          );
+        }
+      }
       return res.status(201).send(response);
     }
   }
