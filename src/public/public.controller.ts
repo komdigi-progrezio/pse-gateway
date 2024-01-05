@@ -82,6 +82,9 @@ export class PublicController {
         const user = await firstValueFrom(
           this.clientUser.send('findOneUser', response.account_id),
         );
+        await firstValueFrom(
+          this.clientNotification.send('userRegistration', user.data),
+        );
 
         if (data.status_register == '1') {
           await firstValueFrom(
