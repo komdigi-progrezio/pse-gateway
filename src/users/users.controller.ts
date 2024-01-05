@@ -202,18 +202,23 @@ export class UsersController {
       const resp = await firstValueFrom(
         this.client.send('changeStatusUser', request),
       );
-      if (
-        resp.status !== undefined &&
-        resp.status == 200 &&
-        status === 'enable'
-      ) {
+      if (resp.status !== undefined && resp.status == 200) {
         // send email notification
-        await firstValueFrom(
-          this.notificationClient.send(
-            'pejabatPendaftarAktivasi',
-            user.data.username,
-          ),
-        );
+        if (status === 'enable') {
+          await firstValueFrom(
+            this.notificationClient.send(
+              'pejabatPendaftarAktivasi',
+              user.data.username,
+            ),
+          );
+        } else if (status === 'disable') {
+          await firstValueFrom(
+            this.notificationClient.send(
+              'userDisableAccountSubstitution',
+              user.data,
+            ),
+          );
+        }
       }
 
       return resp;
