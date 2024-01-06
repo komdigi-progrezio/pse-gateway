@@ -18,9 +18,10 @@ import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as querystring from 'querystring';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
+import { multerOptions } from './config/users.config.upload';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -186,7 +187,10 @@ export class UsersController {
             data['groups'] = ['Admin'];
           }
           const newUserResp = await this.createUser(data, token);
-          const existUser = await this.getUserByEmail(user.data.username,token);
+          const existUser = await this.getUserByEmail(
+            user.data.username,
+            token,
+          );
           keycloakId = existUser.id;
         } else {
           keycloakId = existUser.id;
@@ -284,8 +288,9 @@ export class UsersController {
     return this.client.send('updateUser', body);
   }
   @Post('/parent/account')
-  @UseInterceptors(NoFilesInterceptor())
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
   async storeParent(@Body() body: any, @Req() request: any) {
+    // console.log('asd');
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
@@ -364,5 +369,4 @@ export class UsersController {
       throw error;
     }
   }
-
 }
