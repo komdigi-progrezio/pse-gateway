@@ -18,9 +18,10 @@ import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import axios, { AxiosRequestConfig } from 'axios';
 import * as querystring from 'querystring';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
+import { multerOptions } from './config/users.config.upload';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -147,8 +148,57 @@ export class UsersController {
   }
   @Patch('/approved/account/change')
   @UseInterceptors(NoFilesInterceptor())
-  async approvedAccountChange(@Body() data: any) {
-    return this.client.send('approvedAccountChange', data);
+  async approvedAccountChange(@Body() data: any, @Req() req: any) {
+    const headers = req.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const status = 'enable';
+    const id = data.new_id
+    const user = await firstValueFrom(this.client.send('findOneUser', id));
+    const keycloakId = await this.enable(user.data, token);
+
+    const request = {
+      status,
+      id,
+      keycloakId,
+    };
+
+    const resp = await firstValueFrom(
+      this.client.send('changeStatusUser', request),
+    );
+    if (resp.status !== undefined && resp.status == 200) {
+      // send email notification
+      await firstValueFrom(
+        this.notificationClient.send(
+          'pejabatPendaftarAktivasi',
+          user.data.username,
+        ),
+      );
+    }
+
+    const res = await firstValueFrom(this.client.send('approvedAccountChange', data));
+
+    if (data.old_id !== null) {
+      const oldUser = await firstValueFrom(
+        this.client.send('findOneUser', data.old_id),
+      );
+     await firstValueFrom(
+       this.notificationClient.send('userDisableAccountSubstitution', oldUser.data),
+     );
+    }
+
+    const userEnableRequest = {
+      user: user.data,
+      password: user.data.username,
+    };
+    await firstValueFrom(
+      this.notificationClient.send('userEnableAccountSubstitution', userEnableRequest)
+    );
+
+    return res;
   }
 
   @Patch('/:status/:id')
@@ -167,30 +217,7 @@ export class UsersController {
       const user = await firstValueFrom(this.client.send('findOneUser', id));
       let keycloakId: string;
       if (status === 'enable') {
-        const existUser = await this.getUserByEmail(user.data.username, token);
-        if (!existUser) {
-          const data = {
-            firstName: user.data.nama,
-            email: user.data.username,
-            enabled: true,
-            username: user.data.username,
-            credentials: [
-              {
-                type: 'password',
-                value: user.data.username,
-                temporary: true,
-              },
-            ],
-          };
-          if (user.data.is_admin) {
-            data['groups'] = ['Admin'];
-          }
-          const newUserResp = await this.createUser(data, token);
-          const existUser = await this.getUserByEmail(user.data.username,token);
-          keycloakId = existUser.id;
-        } else {
-          keycloakId = existUser.id;
-        }
+        keycloakId = await this.enable(user.data, token);
       }
 
       const request = {
@@ -202,18 +229,23 @@ export class UsersController {
       const resp = await firstValueFrom(
         this.client.send('changeStatusUser', request),
       );
-      if (
-        resp.status !== undefined &&
-        resp.status == 200 &&
-        status === 'enable'
-      ) {
+      if (resp.status !== undefined && resp.status == 200) {
         // send email notification
-        await firstValueFrom(
-          this.notificationClient.send(
-            'pejabatPendaftarAktivasi',
-            user.data.username,
-          ),
-        );
+        if (status === 'enable') {
+          await firstValueFrom(
+            this.notificationClient.send(
+              'pejabatPendaftarAktivasi',
+              user.data.username,
+            ),
+          );
+        } else if (status === 'disable') {
+          await firstValueFrom(
+            this.notificationClient.send(
+              'userDisableAccountSubstitution',
+              user.data,
+            ),
+          );
+        }
       }
 
       return resp;
@@ -284,8 +316,9 @@ export class UsersController {
     return this.client.send('updateUser', body);
   }
   @Post('/parent/account')
-  @UseInterceptors(NoFilesInterceptor())
+  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
   async storeParent(@Body() body: any, @Req() request: any) {
+    // console.log('asd');
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
@@ -365,4 +398,35 @@ export class UsersController {
     }
   }
 
+  private async enable(user: any, token: any): Promise<string> {
+    let keycloakId:string;
+    const existUser = await this.getUserByEmail(user.username, token);
+    if (!existUser) {
+      const data = {
+        firstName: user.nama,
+        email: user.username,
+        enabled: true,
+        username: user.username,
+        credentials: [
+          {
+            type: 'password',
+            value: user.username,
+            temporary: true,
+          },
+        ],
+      };
+      if (user.is_admin) {
+        data['groups'] = ['Admin'];
+      }
+      const newUserResp = await this.createUser(data, token);
+      const existUser = await this.getUserByEmail(
+        user.username,
+        token,
+      );
+      keycloakId = existUser.id;
+    } else {
+      keycloakId = existUser.id;
+    }
+    return keycloakId;
+  }
 }

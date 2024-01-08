@@ -77,7 +77,7 @@ export class ReportService {
 
     content.forEach((element, key) => {
       if (element.field) {
-        if (key <= 19) {
+        if (key <= 20) {
           const columnLength = element.field ? element.field.length : 1;
 
           let endColumnCharCode = startColumnCharCode + columnLength - 1;
