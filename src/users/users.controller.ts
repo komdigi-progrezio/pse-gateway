@@ -328,6 +328,10 @@ export class UsersController {
       return resp;
     }
   }
+  @Get('')
+  async allUserData(@Query() request: any) {
+    return this.client.send('dropdownUser', request);
+  }
 
   @Get('/dropdown')
   async dropdown(@Query() request: any) {
