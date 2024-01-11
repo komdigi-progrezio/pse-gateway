@@ -181,4 +181,10 @@ export class SystemsController {
   async destroy(@Param('id') id: number) {
     return this.client.send('removeSystem', id);
   }
+
+  @Patch('/:id/locked')
+  @UseInterceptors(NoFilesInterceptor())
+  async lockedSystem(@Param('id') id: number) {
+    return this.client.send('lockedSystem', id);
+  }
 }

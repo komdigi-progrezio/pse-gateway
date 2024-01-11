@@ -35,6 +35,8 @@ export class getCachedData {
 
     let cacheData = await this.cacheService.get(email);
 
+    console.log(cacheData);
+
     if (!cacheData) {
       const ssoData = await this.fetchDataFromSso(token, email);
       const userData = await this.client.send('authUser', email).toPromise();
@@ -77,5 +79,9 @@ export class getCachedData {
     const timeUntilExp = keycloakExp - currentTime;
 
     await this.cacheService.set(email, data, timeUntilExp);
+  }
+
+  async clearCacheData(email: string) {
+    await this.cacheService.del(email);
   }
 }

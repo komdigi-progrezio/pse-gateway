@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   Inject,
   Injectable,
+  Res,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
@@ -22,6 +23,7 @@ import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
 import { multerOptions } from './config/users.config.upload';
+import { Response, response } from 'express';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -135,16 +137,83 @@ export class UsersController {
 
   @Post('/:id/official')
   @UseInterceptors(NoFilesInterceptor())
-  async updateUser(@Param('id') id: number, @Body() data: any) {
+  async updateUser(
+    @Param('id') id: number,
+    @Body() data: any,
+    @Req() request: any,
+  ) {
     data.id = id;
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const emailAccount = responseCached?.data?.email || null;
+
+    console.log(emailAccount);
+
+    await cacheData.clearCacheData(emailAccount);
+
     return this.client.send('updateProfile', data);
   }
 
   @Post('/:id/profile')
   @UseInterceptors(NoFilesInterceptor())
-  async updateProfile(@Param('id') id: number, @Body() data: any) {
+  async updateProfile(
+    @Param('id') id: number,
+    @Body() data: any,
+    @Req() request: any,
+    @Res() res: Response,
+  ) {
     data.id = id;
-    return this.client.send('updateProfile', data);
+
+    const resp = await firstValueFrom(this.client.send('updateProfile', data));
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const emailAccount = responseCached?.data?.email || null;
+
+    await cacheData.clearCacheData(emailAccount);
+
+    res.status(200).send(resp);
+  }
+  @Patch('/:id/profile')
+  @UseInterceptors(NoFilesInterceptor())
+  async updatePatchProfile(
+    @Param('id') id: number,
+    @Body() data: any,
+    @Req() request: any,
+    @Res() res: Response,
+  ) {
+    data.id = id;
+    const resp = await firstValueFrom(this.client.send('updateProfile', data));
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const emailAccount = responseCached?.data?.email || null;
+
+    await cacheData.clearCacheData(emailAccount);
+
+    res.status(200).send(resp);
   }
   @Patch('/approved/account/change')
   @UseInterceptors(NoFilesInterceptor())
@@ -156,7 +225,7 @@ export class UsersController {
     }
 
     const status = 'enable';
-    const id = data.new_id
+    const id = data.new_id;
     const user = await firstValueFrom(this.client.send('findOneUser', id));
     const keycloakId = await this.enable(user.data, token);
 
@@ -179,15 +248,20 @@ export class UsersController {
       );
     }
 
-    const res = await firstValueFrom(this.client.send('approvedAccountChange', data));
+    const res = await firstValueFrom(
+      this.client.send('approvedAccountChange', data),
+    );
 
     if (data.old_id !== null) {
       const oldUser = await firstValueFrom(
         this.client.send('findOneUser', data.old_id),
       );
-     await firstValueFrom(
-       this.notificationClient.send('userDisableAccountSubstitution', oldUser.data),
-     );
+      await firstValueFrom(
+        this.notificationClient.send(
+          'userDisableAccountSubstitution',
+          oldUser.data,
+        ),
+      );
     }
 
     const userEnableRequest = {
@@ -195,7 +269,10 @@ export class UsersController {
       password: user.data.username,
     };
     await firstValueFrom(
-      this.notificationClient.send('userEnableAccountSubstitution', userEnableRequest)
+      this.notificationClient.send(
+        'userEnableAccountSubstitution',
+        userEnableRequest,
+      ),
     );
 
     return res;
@@ -250,6 +327,10 @@ export class UsersController {
 
       return resp;
     }
+  }
+  @Get('')
+  async allUserData(@Query() request: any) {
+    return this.client.send('dropdownUser', request);
   }
 
   @Get('/dropdown')
@@ -399,7 +480,7 @@ export class UsersController {
   }
 
   private async enable(user: any, token: any): Promise<string> {
-    let keycloakId:string;
+    let keycloakId: string;
     const existUser = await this.getUserByEmail(user.username, token);
     if (!existUser) {
       const data = {
@@ -419,10 +500,7 @@ export class UsersController {
         data['groups'] = ['Admin'];
       }
       const newUserResp = await this.createUser(data, token);
-      const existUser = await this.getUserByEmail(
-        user.username,
-        token,
-      );
+      const existUser = await this.getUserByEmail(user.username, token);
       keycloakId = existUser.id;
     } else {
       keycloakId = existUser.id;
