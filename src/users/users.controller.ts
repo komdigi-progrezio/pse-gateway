@@ -422,6 +422,9 @@ export class UsersController {
       await firstValueFrom(
         this.notificationClient.send('pendaftaranSubPejabat', user.data),
       );
+      await firstValueFrom(
+        this.notificationClient.send('userRegistration', user.data),
+      );
     }
 
     delete resp.id;
