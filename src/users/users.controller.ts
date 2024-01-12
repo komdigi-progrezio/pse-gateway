@@ -209,7 +209,7 @@ export class UsersController {
     const cacheData = new getCachedData(this.jwtService, this.cacheService);
     const responseCached = await cacheData.account(token);
 
-    const emailAccount = responseCached?.data?.email || null;
+    const emailAccount = responseCached?.data?.username || null;
 
     await cacheData.clearCacheData(emailAccount);
 
@@ -421,6 +421,9 @@ export class UsersController {
       // send email notification
       await firstValueFrom(
         this.notificationClient.send('pendaftaranSubPejabat', user.data),
+      );
+      await firstValueFrom(
+        this.notificationClient.send('userRegistration', user.data),
       );
     }
 

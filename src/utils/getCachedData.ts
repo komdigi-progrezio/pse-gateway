@@ -35,7 +35,7 @@ export class getCachedData {
 
     let cacheData = await this.cacheService.get(email);
 
-    console.log(cacheData);
+    // console.log(cacheData);
 
     if (!cacheData) {
       const ssoData = await this.fetchDataFromSso(token, email);

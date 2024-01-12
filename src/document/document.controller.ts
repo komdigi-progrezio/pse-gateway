@@ -14,6 +14,7 @@ import { Express } from 'express';
 
 import { multerOptions } from './config/document.config.upload';
 import * as uuid from 'uuid';
+import { readFileSync } from 'fs';
 
 @Controller('api/document')
 export class DocumentController {
@@ -24,10 +25,20 @@ export class DocumentController {
   private readonly client: ClientProxy;
 
   @Post()
-  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
-  uploadFile(@Body() body: any) {
-    body.id = uuid.v4();
-    return this.client.send('createDocument', body);
+  @UseInterceptors(FileInterceptor('dokumen'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    try {
+      // Ini akan mengirim data file ke microservice
+      // console.log(file);
+      const fileData: Buffer = readFileSync(file.path);
+
+      const result = await this.client
+        .send('createDocument', fileData)
+        .toPromise();
+      return result;
+    } catch (error) {
+      throw new Error(`Failed to upload file: ${error.message}`);
+    }
   }
 
   @Delete('/:id')

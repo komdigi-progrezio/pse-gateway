@@ -89,10 +89,7 @@ export class ReportService {
             if (startColumnLetter.charCodeAt(0) <= 'Z'.charCodeAt(0)) {
               const firstLetterCode =
                 Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
-              console.log(
-                'startColumnCharCode',
-                String.fromCharCode(firstLetterCode),
-              );
+
               startColumnCharCode = firstLetterCode;
 
               endColumnCharCode =
