@@ -42,6 +42,33 @@ export class StorageController {
       };
     }
   }
+
+  @Get('/badge/:badge')
+  async getBadge(@Param('badge') badge: string, @Res() response: Response) {
+    try {
+      const dataResp = await this.client
+        .send('badgeShowSystem', badge)
+        .toPromise();
+
+      if (!dataResp || !dataResp.value) {
+        // Handle gambar tidak ditemukan
+        response.status(404).send('Gambar tidak ditemukan');
+        return;
+      }
+
+      const imageBuffer = dataResp.value;
+
+      const buffer = Buffer.from(imageBuffer.data);
+
+      fs.writeFileSync('temp/file_output.png', buffer);
+
+      response.sendfile('temp/file_output.png');
+    } catch (error) {
+      // Handle kesalahan lainnya
+      response.status(500).send('Terjadi kesalahan');
+    }
+  }
+
   @Get('/statistics/:name')
   getFileAndDeleteStatistics(
     @Param('name') fileName: string,
