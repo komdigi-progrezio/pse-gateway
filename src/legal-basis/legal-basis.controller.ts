@@ -29,6 +29,7 @@ export class LegalBasisController {
   }
 
   @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
   async update(@Body() body: any, @Param('id') id: number) {
     body.id = id;
 
