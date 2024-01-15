@@ -167,11 +167,13 @@ export class UsersController {
 
     const emailAccount = responseCached?.data?.email || null;
 
-    console.log(emailAccount);
-
     await cacheData.clearCacheData(emailAccount);
 
-    return this.client.send('updateProfile', data);
+    // Memeriksa status cache setelah penghapusan
+
+    // Jika cache sudah dihapus, kirim permintaan updateProfile
+    const result = await this.client.send('updateProfile', data).toPromise();
+    return result;
   }
 
   @Post('/:id/profile')
