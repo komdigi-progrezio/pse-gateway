@@ -103,9 +103,21 @@ export class UsersController {
     return this.client.send('findAllUsersLog', data);
   }
   @Get('/change')
-  async changeUser(@Query() request: any) {
+  async changeUser(@Query() data: any, @Req() request: any) {
     // return request;
-    const data = request;
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+    // console.log(responseCached);
+
+    data.account_id = responseCached?.data?.id || null;
+
     return this.client.send('findChangeUsersFilter', data);
   }
   @Get('/parent/account')
