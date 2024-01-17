@@ -45,6 +45,23 @@ export class UsersController {
   })
   private readonly notificationClient: ClientProxy;
 
+  @Get('/get/profil')
+  async getProfil(@Req() request: any) {
+    const headers = request.headers;
+
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    const account_id = responseCached?.data?.id || null;
+
+    return this.client.send('getProfilUser', account_id);
+  }
+
   @Get('/get/authenticated')
   async authenti(@Req() request: any) {
     try {
