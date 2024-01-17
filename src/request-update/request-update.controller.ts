@@ -52,7 +52,20 @@ export class RequestUpdateController {
   }
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() body: any) {
+  async create(@Body() body: any, @Req() request: any) {
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+    // console.log(responseCached);
+
+    const account_id = responseCached?.data.id || null;
+
+    body.account_id = account_id;
     // Lakukan sesuatu dengan files
     return this.client.send('createRequestUpdate', body);
   }
