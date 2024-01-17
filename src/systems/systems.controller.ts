@@ -130,18 +130,11 @@ export class SystemsController {
     const account_id = responseCached?.data?.id || null;
 
     body.account_id = account_id;
-    return this.client.send('createSystem', body);
-  }
-
-  @Post('/:id')
-  @UseInterceptors(NoFilesInterceptor())
-  async update(@Body() body: any, @Param('id') id: number) {
-    body.id = id;
-    const resp = await firstValueFrom(this.client.send('updateSystem', body));
+    const resp = await firstValueFrom(this.client.send('createSystem', body));
 
     if (resp.status !== undefined && resp.status == 200) {
       const system = await firstValueFrom(
-        this.client.send('findOneSystem', id),
+        this.client.send('findOneSystem', resp.id),
       );
       await firstValueFrom(
         this.clientNotification.send('pendaftaranSeBaru', system.data),
@@ -150,7 +143,15 @@ export class SystemsController {
         this.clientNotification.send('systemRegistration', system.data),
       );
     }
-    return resp;
+
+    return resp
+  }
+
+  @Post('/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async update(@Body() body: any, @Param('id') id: number) {
+    body.id = id;
+    return await firstValueFrom(this.client.send('updateSystem', body));
   }
 
   @Patch('/approved/publish/:id')
