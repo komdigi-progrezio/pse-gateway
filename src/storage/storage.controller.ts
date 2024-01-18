@@ -2,6 +2,7 @@ import { Controller, Get, Param, Res, NotFoundException } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { Response } from 'express';
 import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('api/storage')
 export class StorageController {
@@ -57,14 +58,32 @@ export class StorageController {
       }
 
       const imageBuffer = dataResp.value;
-
       const buffer = Buffer.from(imageBuffer.data);
+      console.log(dataResp.name);
 
-      fs.writeFileSync('temp/file_output.png', buffer);
+      const filePath = path.join(__dirname, '../../temp', dataResp.name);
 
-      response.sendfile('temp/file_output.png');
+      console.log(filePath);
+
+      await fs.writeFileSync(filePath, buffer);
+
+      response.sendFile(filePath, async (err: any) => {
+        if (err) {
+          console.error(err);
+          response.status(err.status).end();
+        } else {
+          // Hapus file setelah dikirim sebagai respons
+          try {
+            await fs.promises.unlink(filePath);
+            console.log(`File '${dataResp.name}' telah dihapus.`);
+          } catch (error) {
+            console.error(`Gagal menghapus file '${dataResp.name}':`, error);
+          }
+        }
+      });
     } catch (error) {
       // Handle kesalahan lainnya
+      console.error(error);
       response.status(500).send('Terjadi kesalahan');
     }
   }
