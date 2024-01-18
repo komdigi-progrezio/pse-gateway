@@ -68,12 +68,12 @@ export class StorageController {
       fs.writeFile(filePath, buffer, (err: any) => {
         if (err) {
           console.error(err);
-          response.status(err.status).end();
+          throw new NotFoundException('File tidak ditemukan');
         } else {
           response.sendFile(filePath, async (err: any) => {
             if (err) {
               console.error(err);
-              response.status(err.status).end();
+              throw new NotFoundException('File tidak ditemukan');
             } else {
               // Hapus file setelah dikirim sebagai respons
               try {
@@ -145,38 +145,42 @@ export class StorageController {
 
       const imageBuffer = dataResp.value;
 
-      console.log(imageBuffer);
+      // console.log(imageBuffer);
 
       const buffer = Buffer.from(imageBuffer.data);
 
-      const filePath = path.join(__dirname, '../../temp', dataResp.name);
+      // Set header respons untuk tipe konten PDF
+      response.setHeader('Content-Type', 'application/pdf');
 
-      console.log(filePath);
+      // Set header responsepons untuk menentukan cara file akan ditampilkan oleh browser
+      response.setHeader(
+        'Content-Disposition',
+        `inline; filename=${dataResp.name}`,
+      );
 
-      fs.writeFile(filePath, buffer, (err: any) => {
-        if (err) {
-          console.error('disini', err);
-          response.status(err.status).end();
-        } else {
-          response.sendFile(filePath, async (err: any) => {
-            if (err) {
-              console.error('disana', err);
-              response.status(err.status).end();
-            } else {
-              // Hapus file setelah dikirim sebagai respons
-              try {
-                await fs.promises.unlink(filePath);
-                console.log(`File '${dataResp.name}' telah dihapus.`);
-              } catch (error) {
-                console.error(
-                  `Gagal menghapus file '${dataResp.name}':`,
-                  error,
-                );
-              }
-            }
-          });
-        }
-      });
+      // Kirim buffer sebagai responsepons
+      response.send(buffer);
+
+      // console.log(buffer);
+
+      // const filePath = path.join(__dirname, '../../temp', dataResp.name);
+
+      // // console.log(filePath);
+
+      // fs.writeFile(filePath, buffer, (err: any) => {
+      //   if (err) {
+      //     console.error('disini', err);
+      //     throw new NotFoundException('File tidak ditemukan');
+      //   } else {
+      //     response.header('Content-Type', 'application/pdf');
+      //     response.download(filePath, async (err: any) => {
+      //       if (err) {
+      //         console.error('disana', err);
+      //         throw new NotFoundException('File tidak ditemukan');
+      //       }
+      //     });
+      //   }
+      // });
     } catch (error) {
       // Handle kesalahan lainnya
       console.error(error);
