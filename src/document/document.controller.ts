@@ -26,15 +26,12 @@ export class DocumentController {
 
   @Post()
   @UseInterceptors(FileInterceptor('dokumen'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: any, @Body() body: any) {
     try {
-      // Ini akan mengirim data file ke microservice
-      // console.log(file);
-      const fileData: Buffer = readFileSync(file.path);
+      body.id = uuid.v4();
+      file.body = body;
 
-      const result = await this.client
-        .send('createDocument', fileData)
-        .toPromise();
+      const result = await this.client.send('createDocument', file).toPromise();
       return result;
     } catch (error) {
       throw new Error(`Failed to upload file: ${error.message}`);
