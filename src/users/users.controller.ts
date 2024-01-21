@@ -13,6 +13,7 @@ import {
   Inject,
   Injectable,
   Res,
+  UploadedFile,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
@@ -428,8 +429,12 @@ export class UsersController {
     return this.client.send('updateUser', body);
   }
   @Post('/parent/account')
-  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
-  async storeParent(@Body() body: any, @Req() request: any) {
+  @UseInterceptors(FileInterceptor('dokumen'))
+  async storeParent(
+    @Body() body: any,
+    @Req() request: any,
+    @UploadedFile() file: any,
+  ) {
     // console.log('asd');
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
@@ -442,9 +447,10 @@ export class UsersController {
 
     const account_id = responseCached?.data?.id || null;
 
-    body.account_id = account_id;
+    file.body = body;
+    file.body.account_id = account_id;
 
-    const resp = await firstValueFrom(this.client.send('storeParent', body));
+    const resp = await firstValueFrom(this.client.send('storeParent', file));
     if (resp.id !== undefined && resp.id != 0) {
       const user = await firstValueFrom(
         this.client.send('findOneUser', resp.id),
