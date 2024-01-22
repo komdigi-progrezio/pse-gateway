@@ -18,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('api/request-update')
 export class RequestUpdateController {
@@ -31,6 +32,12 @@ export class RequestUpdateController {
     options: { port: +process.env.PSE_CORE_SERVICE_PORT },
   })
   private readonly client: ClientProxy;
+
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+  })
+  private readonly clientNotification: ClientProxy;
 
   @Get('/filter')
   async getFilter(@Query() data: any, @Req() request: any) {
@@ -67,7 +74,23 @@ export class RequestUpdateController {
 
     body.account_id = account_id;
     // Lakukan sesuatu dengan files
-    return this.client.send('createRequestUpdate', body);
+    const resp = await firstValueFrom(
+      this.client.send('createRequestUpdate', body),
+    );
+
+    if (resp.status !== undefined && resp.status == 200) {
+      const request = {
+        id: resp.id,
+        user_id: account_id,
+        sis_profil_id: body.sis_profil_id,
+        reason: body.reason,
+      };
+      await firstValueFrom(
+        this.clientNotification.send('systemRequestUpdate', request),
+      );
+    }
+
+    return resp;
   }
 
   @Patch('/approved/:id')
