@@ -12,6 +12,12 @@ export class StorageController {
   })
   private readonly client: ClientProxy;
 
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+  })
+  private readonly clientUser: ClientProxy;
+
   @Get('/report_excel/:name')
   getFileAndDelete(@Param('name') fileName: string, @Res() res: Response) {
     const pathName = 'temp/' + fileName;
@@ -139,13 +145,11 @@ export class StorageController {
         .toPromise();
       if (!dataResp || !dataResp.value) {
         // Handle gambar tidak ditemukan
-        response.status(404).send('Gambar tidak ditemukan');
+        response.status(404).send('Document tidak ditemukan');
         return;
       }
 
       const imageBuffer = dataResp.value;
-
-      // console.log(imageBuffer);
 
       const buffer = Buffer.from(imageBuffer.data);
 
@@ -160,27 +164,40 @@ export class StorageController {
 
       // Kirim buffer sebagai responsepons
       response.send(buffer);
+    } catch (error) {
+      // Handle kesalahan lainnya
+      console.error(error);
+      response.status(500).send('Terjadi kesalahan');
+    }
+  }
 
-      // console.log(buffer);
+  @Get('/dokumen_pejabat/:document')
+  async getDocumentPejabat(@Param() data: any, @Res() response: Response) {
+    try {
+      const dataResp = await this.clientUser
+        .send('getDocumentPejabat', data)
+        .toPromise();
+      if (!dataResp || !dataResp.value) {
+        // Handle gambar tidak ditemukan
+        response.status(404).send('Dokumen tidak ditemukan');
+        return;
+      }
 
-      // const filePath = path.join(__dirname, '../../temp', dataResp.name);
+      const imageBuffer = dataResp.value;
 
-      // // console.log(filePath);
+      const buffer = Buffer.from(imageBuffer.data);
 
-      // fs.writeFile(filePath, buffer, (err: any) => {
-      //   if (err) {
-      //     console.error('disini', err);
-      //     throw new NotFoundException('File tidak ditemukan');
-      //   } else {
-      //     response.header('Content-Type', 'application/pdf');
-      //     response.download(filePath, async (err: any) => {
-      //       if (err) {
-      //         console.error('disana', err);
-      //         throw new NotFoundException('File tidak ditemukan');
-      //       }
-      //     });
-      //   }
-      // });
+      // Set header respons untuk tipe konten PDF
+      response.setHeader('Content-Type', 'application/pdf');
+
+      // Set header responsepons untuk menentukan cara file akan ditampilkan oleh browser
+      response.setHeader(
+        'Content-Disposition',
+        `inline; filename=${dataResp.name}`,
+      );
+
+      // Kirim buffer sebagai responsepons
+      response.send(buffer);
     } catch (error) {
       // Handle kesalahan lainnya
       console.error(error);
