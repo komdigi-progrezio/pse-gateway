@@ -175,4 +175,6 @@ export class ReportService {
       status: 200,
     };
   }
+
+  async excelAll(allReport) {}
 }
