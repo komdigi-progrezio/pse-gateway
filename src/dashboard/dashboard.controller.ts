@@ -57,7 +57,20 @@ export class DashboardController {
     return this.client.send('chartSystemElectronicDashboard', request);
   }
   @Get('/chart/request/update')
-  async chartRequestUpdate(@Query() request: any) {
+  async chartRequestUpdate(@Query() request: any,  @Req() req) {
+    const data: any = {};
+
+    const headers = req.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+    const responseCached = await cacheData.account(token);
+
+    data.user = responseCached?.data;
+    request.user = data.user;
     return this.client.send('chartRequestUpdateDashboard', request);
   }
   @Get('/chart/system/downloadelectronic')

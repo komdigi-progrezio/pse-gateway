@@ -84,10 +84,30 @@ export class ReportController {
     data.user = responseCached?.data;
 
     const report = await this.client.send('excelReport', data).toPromise();
-    console.log(report);
+
     // return await report;
 
     return await this.reportService.excel(report);
+  }
+
+  @Get('/excel-all')
+  async excelAll(@Req() request: any) {
+    const data: any = {};
+
+    const headers = request.headers;
+    const token = headers.authorization?.split(' ')[1];
+    if (!token) {
+      return { message: 'Unauthorized' };
+    }
+    const cacheData = new getCachedData(this.jwtService, this.cacheService);
+
+    const responseCached = await cacheData.account(token);
+
+    data.user = responseCached?.data;
+
+    const allReport = await this.client.send('excelAll', data).toPromise();
+
+    return await this.reportService.excelAll(allReport);
   }
 
   @Get('/:id')
