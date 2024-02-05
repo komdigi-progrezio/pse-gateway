@@ -300,8 +300,8 @@ export class ReportService {
 
   async excelAll(reportData: any) {
     const timestamp = formattedDate();
-    const filePath = `Laporan_${reportData.user.nama}_${timestamp}`;
-    const output = fs.createWriteStream(`temp/${filePath}.zip`);
+    const filePath = `Laporan_${reportData.user.nama}_${timestamp}.zip`;
+    const output = fs.createWriteStream(`temp/${filePath}`);
     // const output = fs.createWriteStream(`C:/PSE/storage/${filePath}.zip`);
 
     var archive = archiver('zip', {
