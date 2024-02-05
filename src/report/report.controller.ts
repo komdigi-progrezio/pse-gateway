@@ -104,10 +104,12 @@ export class ReportController {
     const responseCached = await cacheData.account(token);
 
     data.user = responseCached?.data;
+    
+    const allReport = await this.client.send('findByUser', data).toPromise();
+    // console.log("allReport",allReport)
+    data.report = allReport;
 
-    const allReport = await this.client.send('excelAll', data).toPromise();
-
-    return await this.reportService.excelAll(allReport);
+    return await this.reportService.excelAll(data);
   }
 
   @Get('/:id')
