@@ -85,7 +85,7 @@ export class RequestUpdateController {
         sis_profil_id: body.sis_profil_id,
         reason: body.reason,
       };
-      await firstValueFrom(
+      firstValueFrom(
         this.clientNotification.send('systemRequestUpdate', request),
       );
     }
