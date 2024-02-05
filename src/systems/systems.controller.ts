@@ -136,10 +136,10 @@ export class SystemsController {
       const system = await firstValueFrom(
         this.client.send('findOneSystem', resp.id),
       );
-      await firstValueFrom(
+      firstValueFrom(
         this.clientNotification.send('pendaftaranSeBaru', system.data),
       );
-      await firstValueFrom(
+      firstValueFrom(
         this.clientNotification.send('systemRegistration', system.data),
       );
     }
@@ -164,7 +164,7 @@ export class SystemsController {
 
     if (resp.status !== undefined && resp.status == 200) {
       const system = await firstValueFrom(this.client.send('findOneSystem', id));
-      await firstValueFrom(
+      firstValueFrom(
         this.clientNotification.send('systemRegistrationInitial', system.data),
       );
     }
@@ -181,7 +181,7 @@ export class SystemsController {
       const system = await firstValueFrom(
         this.client.send('findOneSystem', id),
       );
-      await firstValueFrom(
+      firstValueFrom(
         this.clientNotification.send('systemRegistrationApproved', system.data),
       );
     }

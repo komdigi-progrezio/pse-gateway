@@ -82,16 +82,16 @@ export class PublicController {
         const user = await firstValueFrom(
           this.clientUser.send('findOneUser', response.account_id),
         );
-        await firstValueFrom(
+        firstValueFrom(
           this.clientNotification.send('userRegistration', user.data),
         );
 
         if (data.status_register == '1') {
-          await firstValueFrom(
+          firstValueFrom(
             this.clientNotification.send('pejabatPendaftarBaru', user.data),
           );
         } else {
-          await firstValueFrom(
+          firstValueFrom(
             this.clientNotification.send('pejabatPendaftarPengganti', user.data),
           );
         }
