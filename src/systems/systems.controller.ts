@@ -19,6 +19,7 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
+import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
 @Controller('api/systems')
 export class SystemsController {
@@ -118,6 +119,7 @@ export class SystemsController {
   @Post()
   @UseInterceptors(NoFilesInterceptor())
   async create(@Req() request: any, @Body() body: any) {
+    const clientNotification = new ClientNotificationSend();
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
@@ -136,12 +138,8 @@ export class SystemsController {
       const system = await firstValueFrom(
         this.client.send('findOneSystem', resp.id),
       );
-      firstValueFrom(
-        this.clientNotification.send('pendaftaranSeBaru', system.data),
-      );
-      firstValueFrom(
-        this.clientNotification.send('systemRegistration', system.data),
-      );
+      clientNotification.send('pendaftaranSeBaru', system.data);
+      clientNotification.send('systemRegistration', system.data);
     }
 
     return resp
@@ -157,6 +155,7 @@ export class SystemsController {
   @Patch('/approved/publish/:id')
   @UseInterceptors(NoFilesInterceptor())
   async approvePublish(@Param('id') id: number) {
+    const clientNotification = new ClientNotificationSend();
     const resp = await firstValueFrom(this.client.send(
       'approvePublishSystem',
       id,
@@ -164,9 +163,7 @@ export class SystemsController {
 
     if (resp.status !== undefined && resp.status == 200) {
       const system = await firstValueFrom(this.client.send('findOneSystem', id));
-      firstValueFrom(
-        this.clientNotification.send('systemRegistrationInitial', system.data),
-      );
+      clientNotification.send('systemRegistrationInitial', system.data);
     }
     
     return resp;
@@ -175,15 +172,14 @@ export class SystemsController {
   @Patch('/approved/:id')
   @UseInterceptors(NoFilesInterceptor())
   async approve(@Param('id') id: number, @Body() body: any) {
+    const clientNotification = new ClientNotificationSend();
     const resp = await firstValueFrom(this.client.send('approveSystem', id));
 
     if (resp.status !== undefined && resp.status == 200) {
       const system = await firstValueFrom(
         this.client.send('findOneSystem', id),
       );
-      firstValueFrom(
-        this.clientNotification.send('systemRegistrationApproved', system.data),
-      );
+      clientNotification.send('systemRegistrationApproved', system.data);
     }
 
     return resp;
