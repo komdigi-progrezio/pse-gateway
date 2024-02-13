@@ -7,6 +7,7 @@ import {
   Query,
   UseInterceptors,
   Res,
+  UploadedFile,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
@@ -67,14 +68,16 @@ export class PublicController {
   }
 
   @Post('/pejabat')
-  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
-  async storePejabat(@Body() data: any, @Res() res: Response) {
+  @UseInterceptors(FileInterceptor('dokumen'))
+  async storePejabat(
+    @Body() data: any,
+    @Res() res: Response,
+    @UploadedFile() file: any,
+  ) {
+    data.file = file;
     const response = await this.client
       .send('storePejabatPublic', data)
       .toPromise();
-
-    console.log(response);
-
     if (response.status === 500) {
       return res.status(502).send(response);
     } else {
@@ -85,14 +88,16 @@ export class PublicController {
         await firstValueFrom(
           this.clientNotification.send('userRegistration', user.data),
         );
-
         if (data.status_register == '1') {
           await firstValueFrom(
             this.clientNotification.send('pejabatPendaftarBaru', user.data),
           );
         } else {
           await firstValueFrom(
-            this.clientNotification.send('pejabatPendaftarPengganti', user.data),
+            this.clientNotification.send(
+              'pejabatPendaftarPengganti',
+              user.data,
+            ),
           );
         }
       }
