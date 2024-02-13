@@ -4,10 +4,12 @@ import {
   Delete,
   Param,
   Post,
+  Res,
   UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Response, response } from 'express';
 
 @Controller('api/special-functions')
 export class SpecialFunctionsController {
@@ -17,10 +19,24 @@ export class SpecialFunctionsController {
   })
   private readonly client: ClientProxy;
 
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+  })
+  private readonly notifClient: ClientProxy;
+
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() data: any) {
-    return this.client.send('createSpecialFunction', data);
+  async create(@Body() data: any, @Res() res: Response) {
+    const createSpecialFunction = await this.client
+      .send('createSpecialFunction', data)
+      .toPromise();
+
+    await this.notifClient
+      .send('checkProgressSystem', data.sis_profil_id)
+      .toPromise();
+
+    res.status(200).send(createSpecialFunction);
   }
 
   @Delete('/:id')

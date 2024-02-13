@@ -5,9 +5,12 @@ import {
   Delete,
   Param,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { checkProgress } from 'src/utils/checkProgress';
 
 @Controller('api/softwares')
 export class SoftwaresController {
@@ -19,8 +22,16 @@ export class SoftwaresController {
 
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() body: any) {
-    return this.client.send('createSoftware', body);
+  async create(@Body() body: any, @Res() res: Response) {
+    const createSoftware = await this.client
+      .send('createSoftware', body)
+      .toPromise();
+
+    const progress = new checkProgress();
+
+    await progress.sendMail(body.sis_profil_id);
+
+    res.send(createSoftware);
   }
 
   @Post('/tools')

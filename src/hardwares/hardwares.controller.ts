@@ -5,9 +5,12 @@ import {
   Post,
   Delete,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { checkProgress } from 'src/utils/checkProgress';
 
 @Controller('api/hardwares')
 export class HardwaresController {
@@ -19,8 +22,16 @@ export class HardwaresController {
 
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() body: any) {
-    return this.client.send('createHardware', body);
+  async create(@Body() body: any, @Res() res: Response) {
+    const createHardware = await this.client
+      .send('createHardware', body)
+      .toPromise();
+
+    const progress = new checkProgress();
+
+    await progress.sendMail(body.sis_profil_id);
+
+    res.send(createHardware);
   }
   @Post('/networks')
   @UseInterceptors(NoFilesInterceptor())
