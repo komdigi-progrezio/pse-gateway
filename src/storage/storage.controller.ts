@@ -170,6 +170,39 @@ export class StorageController {
       response.status(500).send('Terjadi kesalahan');
     }
   }
+  @Get('/dokumen_sertifikat/:id/:document')
+  async getSystemCertificate(@Param() data: any, @Res() response: Response) {
+    try {
+      const dataResp = await this.client
+        .send('getDocumentSystem', data)
+        .toPromise();
+      if (!dataResp || !dataResp.value) {
+        // Handle gambar tidak ditemukan
+        response.status(404).send('Document tidak ditemukan');
+        return;
+      }
+
+      const imageBuffer = dataResp.value;
+
+      const buffer = Buffer.from(imageBuffer.data);
+
+      // Set header respons untuk tipe konten PDF
+      response.setHeader('Content-Type', 'application/pdf');
+
+      // Set header responsepons untuk menentukan cara file akan ditampilkan oleh browser
+      response.setHeader(
+        'Content-Disposition',
+        `inline; filename=${dataResp.name}`,
+      );
+
+      // Kirim buffer sebagai responsepons
+      response.send(buffer);
+    } catch (error) {
+      // Handle kesalahan lainnya
+      console.error(error);
+      response.status(500).send('Terjadi kesalahan');
+    }
+  }
 
   @Get('/dokumen_pejabat/:document')
   async getDocumentPejabat(@Param() data: any, @Res() response: Response) {
