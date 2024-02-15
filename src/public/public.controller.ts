@@ -7,6 +7,7 @@ import {
   Query,
   UseInterceptors,
   Res,
+  UploadedFile,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
@@ -17,7 +18,6 @@ import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
 @Controller('api/public')
 export class PublicController {
-  
   @Client({
     transport: Transport.TCP,
     options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
@@ -69,15 +69,17 @@ export class PublicController {
   }
 
   @Post('/pejabat')
-  @UseInterceptors(FileInterceptor('dokumen', multerOptions))
-  async storePejabat(@Body() data: any, @Res() res: Response) {
+  @UseInterceptors(FileInterceptor('dokumen'))
+  async storePejabat(
+    @Body() data: any,
+    @Res() res: Response,
+    @UploadedFile() file: any,
+  ) {
+    data.file = file;
     const clientNotification = new ClientNotificationSend();
     const response = await this.client
       .send('storePejabatPublic', data)
       .toPromise();
-
-    console.log(response);
-
     if (response.status === 500) {
       return res.status(502).send(response);
     } else {
@@ -85,7 +87,7 @@ export class PublicController {
         const user = await firstValueFrom(
           this.clientUser.send('findOneUser', response.account_id),
         );
-          
+
         clientNotification.send('userRegistration', user.data);
 
         if (data.status_register == '1') {
@@ -109,6 +111,4 @@ export class PublicController {
   async create(@Body() data: any) {
     return this.client.send('createParinstansi', data);
   }
-
-
 }

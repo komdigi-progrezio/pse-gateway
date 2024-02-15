@@ -5,9 +5,12 @@ import {
   Delete,
   Param,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { checkProgress } from 'src/utils/checkProgress';
 
 @Controller('api/availability-of-experts')
 export class AvailabilityOfExpertsController {
@@ -19,8 +22,16 @@ export class AvailabilityOfExpertsController {
 
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() body: any) {
-    return this.client.send('createAvailabilityOfExpert', body);
+  async create(@Body() body: any, @Res() res: Response) {
+    const createAvailabilityOfExpert = await this.client
+      .send('createAvailabilityOfExpert', body)
+      .toPromise();
+
+    const progress = new checkProgress();
+
+    await progress.sendMail(body.sis_profil_id);
+
+    res.send(createAvailabilityOfExpert);
   }
 
   @Delete('/:id')

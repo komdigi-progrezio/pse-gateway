@@ -4,10 +4,13 @@ import {
   Delete,
   Param,
   Post,
+  Res,
   UseInterceptors,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { checkProgress } from 'src/utils/checkProgress';
 
 @Controller('api/security')
 export class SecurityController {
@@ -19,8 +22,16 @@ export class SecurityController {
 
   @Post()
   @UseInterceptors(NoFilesInterceptor())
-  async create(@Body() data: any) {
-    return this.client.send('createSecurity', data);
+  async create(@Body() data: any, @Res() res: Response) {
+    const createSecure = await this.client
+      .send('createSecurity', data)
+      .toPromise();
+
+    const progress = new checkProgress();
+
+    await progress.sendMail(data.sis_profil_id);
+
+    res.send(createSecure);
   }
 
   @Post('/:id')
