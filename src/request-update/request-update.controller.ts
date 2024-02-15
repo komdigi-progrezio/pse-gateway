@@ -19,6 +19,7 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
+import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
 @Controller('api/request-update')
 export class RequestUpdateController {
@@ -60,6 +61,7 @@ export class RequestUpdateController {
   @Post()
   @UseInterceptors(NoFilesInterceptor())
   async create(@Body() body: any, @Req() request: any) {
+    const clientNotification = new ClientNotificationSend();
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
@@ -85,9 +87,8 @@ export class RequestUpdateController {
         sis_profil_id: body.sis_profil_id,
         reason: body.reason,
       };
-      await firstValueFrom(
-        this.clientNotification.send('systemRequestUpdate', request),
-      );
+        
+      clientNotification.send('systemRequestUpdate',request);
     }
 
     return resp;

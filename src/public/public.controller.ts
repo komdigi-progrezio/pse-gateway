@@ -14,6 +14,7 @@ import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './config/public.config.upload';
 import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
+import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
 @Controller('api/public')
 export class PublicController {
@@ -75,6 +76,7 @@ export class PublicController {
     @UploadedFile() file: any,
   ) {
     data.file = file;
+    const clientNotification = new ClientNotificationSend();
     const response = await this.client
       .send('storePejabatPublic', data)
       .toPromise();
@@ -85,20 +87,13 @@ export class PublicController {
         const user = await firstValueFrom(
           this.clientUser.send('findOneUser', response.account_id),
         );
-        await firstValueFrom(
-          this.clientNotification.send('userRegistration', user.data),
-        );
+
+        clientNotification.send('userRegistration', user.data);
+
         if (data.status_register == '1') {
-          await firstValueFrom(
-            this.clientNotification.send('pejabatPendaftarBaru', user.data),
-          );
+          clientNotification.send('pejabatPendaftarBaru', user.data);
         } else {
-          await firstValueFrom(
-            this.clientNotification.send(
-              'pejabatPendaftarPengganti',
-              user.data,
-            ),
-          );
+          clientNotification.send('pejabatPendaftarPengganti', user.data);
         }
       }
       return res.status(201).send(response);
