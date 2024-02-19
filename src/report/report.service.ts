@@ -93,7 +93,7 @@ export class ReportService {
           let startColumnLetter = String.fromCharCode(startColumnCharCode);
           let endColumnLetter = '';
 
-          if (endColumnCharCode > 'Z'.charCodeAt(0)) {
+          if (endColumnCharCode >= 'Z'.charCodeAt(0)) {
             // Menangani jika melebihi kolom 'Z'
             if (startColumnLetter.charCodeAt(0) <= 'Z'.charCodeAt(0)) {
               const firstLetterCode =
@@ -186,116 +186,116 @@ export class ReportService {
   }
 
   async excelToBuffer(dataResponse: any) {
-    try{
-    const { content, account_id, name, id, data } = dataResponse;
+    try {
+      const { content, account_id, name, id, data } = dataResponse;
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Data');
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Data');
 
-    let startColumnCharCode = 'A'.charCodeAt(0);
-    let endLetterKe = 0;
-    let startLetterKe = 0;
-    let startMergedCell;
-    let endMergedCell;
+      let startColumnCharCode = 'A'.charCodeAt(0);
+      let endLetterKe = 0;
+      let startLetterKe = 0;
+      let startMergedCell;
+      let endMergedCell;
 
-    content.forEach((element, key) => {
-      if (element.field) {
-        if (key <= 21) {
-          const columnLength = element.field ? element.field.length : 1;
+      content.forEach((element, key) => {
+        if (element.field) {
+          if (key <= 21) {
+            const columnLength = element.field ? element.field.length : 1;
 
-          let endColumnCharCode = startColumnCharCode + columnLength - 1;
-          let startColumnLetter = String.fromCharCode(startColumnCharCode);
-          let endColumnLetter = '';
+            let endColumnCharCode = startColumnCharCode + columnLength - 1;
+            let startColumnLetter = String.fromCharCode(startColumnCharCode);
+            let endColumnLetter = '';
 
-          if (endColumnCharCode > 'Z'.charCodeAt(0)) {
-            // Menangani jika melebihi kolom 'Z'
-            if (startColumnLetter.charCodeAt(0) <= 'Z'.charCodeAt(0)) {
-              const firstLetterCode =
-                Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
+            if (endColumnCharCode > 'Z'.charCodeAt(0)) {
+              // Menangani jika melebihi kolom 'Z'
+              if (startColumnLetter.charCodeAt(0) <= 'Z'.charCodeAt(0)) {
+                const firstLetterCode =
+                  Math.floor((endColumnCharCode - 1) / 26) + 'A'.charCodeAt(0);
 
-              startColumnCharCode = firstLetterCode;
+                startColumnCharCode = firstLetterCode;
 
-              endColumnCharCode =
-                Math.floor((endColumnCharCode - 1) / 26) +
-                'A'.charCodeAt(0) -
-                1;
+                endColumnCharCode =
+                  Math.floor((endColumnCharCode - 1) / 26) +
+                  'A'.charCodeAt(0) -
+                  1;
+                endColumnLetter = String.fromCharCode(endColumnCharCode);
+                endLetterKe++;
+              }
+            } else {
               endColumnLetter = String.fromCharCode(endColumnCharCode);
-              endLetterKe++;
             }
-          } else {
-            endColumnLetter = String.fromCharCode(endColumnCharCode);
+
+            if (startLetterKe > 0 && endLetterKe > 0) {
+              startMergedCell =
+                String.fromCharCode('A'.charCodeAt(0) + startLetterKe - 1) +
+                startColumnLetter +
+                '1';
+              endMergedCell =
+                String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
+                endColumnLetter +
+                '1';
+              if (startLetterKe === endLetterKe - 1) {
+                startLetterKe++;
+              }
+            } else if (endLetterKe > 0) {
+              if (startLetterKe === endLetterKe - 1) {
+                startLetterKe++;
+              }
+              startMergedCell = startColumnLetter + '1';
+              endMergedCell =
+                String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
+                endColumnLetter +
+                '1';
+            } else {
+              startMergedCell = startColumnLetter + '1';
+              endMergedCell = endColumnLetter + '1';
+            }
+            const mergedRange = `${startMergedCell}:${endMergedCell}`;
+
+            console.log('element', element);
+
+            worksheet.mergeCells(mergedRange);
+            worksheet.getCell(startMergedCell).value = element.table.replace(
+              'Sis',
+              '',
+            );
+
+            startColumnCharCode = endColumnCharCode + 1;
           }
-
-          if (startLetterKe > 0 && endLetterKe > 0) {
-            startMergedCell =
-              String.fromCharCode('A'.charCodeAt(0) + startLetterKe - 1) +
-              startColumnLetter +
-              '1';
-            endMergedCell =
-              String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
-              endColumnLetter +
-              '1';
-            if (startLetterKe === endLetterKe - 1) {
-              startLetterKe++;
-            }
-          } else if (endLetterKe > 0) {
-            if (startLetterKe === endLetterKe - 1) {
-              startLetterKe++;
-            }
-            startMergedCell = startColumnLetter + '1';
-            endMergedCell =
-              String.fromCharCode('A'.charCodeAt(0) + endLetterKe - 1) +
-              endColumnLetter +
-              '1';
-          } else {
-            startMergedCell = startColumnLetter + '1';
-            endMergedCell = endColumnLetter + '1';
-          }
-          const mergedRange = `${startMergedCell}:${endMergedCell}`;
-
-          console.log("element",element)
-
-          worksheet.mergeCells(mergedRange);
-          worksheet.getCell(startMergedCell).value = element.table.replace(
-            'Sis',
-            '',
-          );
-
-          startColumnCharCode = endColumnCharCode + 1;
         }
-      }
-    });
+      });
 
-    data.forEach((element) => {
-      worksheet.addRow(element);
-    });
+      data.forEach((element) => {
+        worksheet.addRow(element);
+      });
 
-    // Menggunakan Stream untuk menyimpan file Excel
-    const timestamp = formattedDate();
-    const filePath = `Layanan_${name}_${timestamp}.xlsx`;
-    const tempFilePath = `C:/PSE/storage/${filePath}`;
+      // Menggunakan Stream untuk menyimpan file Excel
+      const timestamp = formattedDate();
+      const filePath = `Layanan_${name}_${timestamp}.xlsx`;
+      const tempFilePath = `C:/PSE/storage/${filePath}`;
 
-    const cell = worksheet.getRow(1);
+      const cell = worksheet.getRow(1);
 
-    cell.border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      bottom: { style: 'thin' },
-      right: { style: 'thin' },
-    };
-    cell.font = {
-      bold: true,
-      size: 14,
-    };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+      cell.font = {
+        bold: true,
+        size: 14,
+      };
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return {
-      buffer: buffer,
-      name:filePath
-    };
-  }catch(e){
-    return null
-  }
+      const buffer = await workbook.xlsx.writeBuffer();
+      return {
+        buffer: buffer,
+        name: filePath,
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   async excelAll(reportData: any) {
@@ -306,33 +306,33 @@ export class ReportService {
 
     var archive = archiver('zip', {
       gzip: true,
-      zlib: { level: 9 } // Sets the compression level.
+      zlib: { level: 9 }, // Sets the compression level.
     });
     archive.pipe(output);
 
-    const addExcel = async (results) =>{
+    const addExcel = async (results) => {
       const dataReport: any = {};
       dataReport.id = results.id;
       dataReport.user = reportData.user;
-      const report  =  await this.client.send('excelReport', dataReport).toPromise();
+      const report = await this.client
+        .send('excelReport', dataReport)
+        .toPromise();
       const reportExcel = await this.excelToBuffer(report);
-      if(reportExcel!=null){
-        archive.append(reportExcel.buffer ,{ name: reportExcel.name });
+      if (reportExcel != null) {
+        archive.append(reportExcel.buffer, { name: reportExcel.name });
       }
-    }
-    
+    };
+
     for await (const results of reportData.report) {
       await addExcel(results);
     }
 
-    console.log("finalize")
+    console.log('finalize');
     archive.finalize();
 
     return {
       path: process.env.APP_DOMAIN + '/api/storage/statistics/' + filePath,
       status: 200,
     };
-
-
   }
 }
