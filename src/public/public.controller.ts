@@ -77,7 +77,7 @@ export class PublicController {
   ) {
     data.file = file;
     const clientNotification = new ClientNotificationSend();
-    const response = await this.client
+    const response = await this.clientUser
       .send('storePejabatPublic', data)
       .toPromise();
     if (response.status === 500) {

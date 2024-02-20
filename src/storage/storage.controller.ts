@@ -17,6 +17,11 @@ export class StorageController {
     options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
   })
   private readonly clientMaster: ClientProxy;
+  @Client({
+    transport: Transport.TCP,
+    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+  })
+  private readonly clientUser: ClientProxy;
 
   @Get('/report_excel/:name')
   getFileAndDelete(@Param('name') fileName: string, @Res() res: Response) {
@@ -207,7 +212,7 @@ export class StorageController {
   @Get('/dokumen_pejabat/:document')
   async getDocumentPejabat(@Param() data: any, @Res() response: Response) {
     try {
-      const dataResp = await this.clientMaster
+      const dataResp = await this.clientUser
         .send('getDocumentPejabat', data)
         .toPromise();
       if (!dataResp || !dataResp.value) {
