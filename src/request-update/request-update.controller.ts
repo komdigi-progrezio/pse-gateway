@@ -87,8 +87,9 @@ export class RequestUpdateController {
         sis_profil_id: body.sis_profil_id,
         reason: body.reason,
       };
-        
-      clientNotification.send('systemRequestUpdate',request);
+
+      clientNotification.send('systemRequestUpdate', request);
+      clientNotification.send('userSystemRequestUpdate', request);
     }
 
     return resp;
