@@ -33,19 +33,22 @@ export class getCachedData {
     const decoded = await this.getDecodedToken(token);
     const email = decoded.email;
 
-    let cacheData = await this.cacheService.get(email);
-
-    // console.log(cacheData);
+    let cacheData = await this.cacheService.get(token);
 
     if (!cacheData) {
       const ssoData = await this.fetchDataFromSso(token, email);
       const userData = await this.client.send('authUser', email).toPromise();
 
-      if (userData && ssoData) {
+      if (ssoData && userData && userData.data && userData.data.status == 1) {
         cacheData = userData || null;
-        this.cacheData(email, cacheData, ssoData.exp).then(() => {
+        this.cacheData(token, cacheData, ssoData.exp).then(() => {
           this.account(token);
         });
+      }else{
+        return {
+          status:401,
+          message:"Login tidak berhasil, silahkan hubungi admin"
+        };
       }
     }
     return cacheData;
