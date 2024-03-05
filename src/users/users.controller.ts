@@ -25,6 +25,7 @@ import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom } from 'rxjs';
 import { multerOptions } from './config/users.config.upload';
 import { Response, response } from 'express';
+import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -250,6 +251,7 @@ export class UsersController {
   @Patch('/approved/account/change')
   @UseInterceptors(NoFilesInterceptor())
   async approvedAccountChange(@Body() data: any, @Req() req: any) {
+    const clientNotification = new ClientNotificationSend();
     const headers = req.headers;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
@@ -272,12 +274,7 @@ export class UsersController {
     );
     if (resp.status !== undefined && resp.status == 200) {
       // send email notification
-      await firstValueFrom(
-        this.notificationClient.send(
-          'pejabatPendaftarAktivasi',
-          user.data.username,
-        ),
-      );
+      clientNotification.send('pejabatPendaftarAktivasi', user.data.username);
     }
 
     const res = await firstValueFrom(
@@ -288,24 +285,16 @@ export class UsersController {
       const oldUser = await firstValueFrom(
         this.client.send('findOneUser', data.old_id),
       );
-      await firstValueFrom(
-        this.notificationClient.send(
-          'userDisableAccountSubstitution',
-          oldUser.data,
-        ),
-      );
+
+      clientNotification.send('userDisableAccountSubstitution', oldUser.data);
     }
 
     const userEnableRequest = {
       user: user.data,
       password: user.data.username,
     };
-    await firstValueFrom(
-      this.notificationClient.send(
-        'userEnableAccountSubstitution',
-        userEnableRequest,
-      ),
-    );
+
+    clientNotification.send('userEnableAccountSubstitution', userEnableRequest);
 
     return res;
   }
