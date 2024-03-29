@@ -1,4 +1,5 @@
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { saveHost, savePort } from 'src/utils/app';
 import { UseInterceptors } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -18,7 +19,10 @@ export class getCachedData {
   ) {
     this.client = ClientProxyFactory.create({
       transport: Transport.TCP,
-      options: { port: +process.env.PSE_USER_SERVICE_PORT },
+      options: {
+        host: saveHost(process.env.PSE_USER_SERVICE_HOST),
+        port: savePort(process.env.PSE_USER_SERVICE_PORT),
+      },
     });
   }
 

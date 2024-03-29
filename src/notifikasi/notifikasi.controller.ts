@@ -6,6 +6,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { saveHost, savePort } from 'src/utils/app';
 import { Cache } from 'cache-manager';
 
 @Controller('api/notifikasi')
@@ -15,7 +16,10 @@ export class NotifikasiController {
   ) {}
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+      port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

@@ -26,6 +26,7 @@ import { firstValueFrom } from 'rxjs';
 import { multerOptions } from './config/users.config.upload';
 import { Response, response } from 'express';
 import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/users')
 @UseInterceptors(CacheInterceptor)
@@ -37,13 +38,19 @@ export class UsersController {
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_USER_SERVICE_HOST),
+      port: savePort(process.env.PSE_USER_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+      port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+    },
   })
   private readonly notificationClient: ClientProxy;
 

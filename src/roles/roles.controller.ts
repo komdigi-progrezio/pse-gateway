@@ -18,6 +18,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
 import { Client, Transport, ClientProxy } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/roles')
 @UseInterceptors(CacheInterceptor)
@@ -27,7 +28,10 @@ export class RolesController {
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_USER_SERVICE_HOST),
+      port: savePort(process.env.PSE_USER_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

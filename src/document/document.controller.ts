@@ -11,7 +11,7 @@ import {
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-
+import { saveHost, savePort } from 'src/utils/app';
 import { multerOptions } from './config/document.config.upload';
 import * as uuid from 'uuid';
 import { readFileSync } from 'fs';
@@ -20,7 +20,10 @@ import { readFileSync } from 'fs';
 export class DocumentController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

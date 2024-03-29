@@ -1,12 +1,16 @@
-  import { Client, ClientProxy, Transport,ClientProxyFactory } from '@nestjs/microservices';
-  import { Observable, Observer, firstValueFrom } from 'rxjs';
+import { Client, ClientProxy, Transport,ClientProxyFactory } from '@nestjs/microservices';
+import { Observable, Observer, firstValueFrom } from 'rxjs';
+import { saveHost, savePort } from 'src/utils/app';
   
-  export class ClientNotificationSend {
+export class ClientNotificationSend {
     constructor(
       ) {
         this.client = ClientProxyFactory.create({
             transport: Transport.TCP,
-            options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+            options: {
+              host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+              port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+            },
         });
       }
 

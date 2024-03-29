@@ -19,6 +19,7 @@ import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { Cache } from 'cache-manager';
 import { Response, response } from 'express';
 import { getCachedData } from 'src/utils/getCachedData';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/parsatuankerja')
 export class ParsatuankerjaController {
@@ -29,7 +30,10 @@ export class ParsatuankerjaController {
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_MASTERDATA_SERVICE_HOST),
+      port: savePort(process.env.PSE_MASTERDATA_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

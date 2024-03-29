@@ -18,6 +18,7 @@ import { Cache } from 'cache-manager';
 import { error } from 'console';
 import { getCachedData } from 'src/utils/getCachedData';
 import { ReportService } from './report.service';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/report')
 export class ReportController {
@@ -28,7 +29,10 @@ export class ReportController {
   ) {}
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

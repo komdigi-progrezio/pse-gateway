@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Res, NotFoundException } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { saveHost, savePort } from 'src/utils/app';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,18 +9,27 @@ import * as path from 'path';
 export class StorageController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_MASTERDATA_SERVICE_HOST),
+      port: savePort(process.env.PSE_MASTERDATA_SERVICE_PORT),
+    },
   })
   private readonly clientMaster: ClientProxy;
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_USER_SERVICE_HOST),
+      port: savePort(process.env.PSE_USER_SERVICE_PORT),
+    },
   })
   private readonly clientUser: ClientProxy;
 

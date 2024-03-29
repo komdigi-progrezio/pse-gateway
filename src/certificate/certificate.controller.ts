@@ -10,13 +10,17 @@ import {
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './config/document.certificate.upload';
+import { saveHost, savePort } from 'src/utils/app';
 import * as uuid from 'uuid';
 
 @Controller('api/certificate')
 export class CertificateController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

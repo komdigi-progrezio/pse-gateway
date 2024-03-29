@@ -8,12 +8,16 @@ import {
 } from '@nestjs/common';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/related')
 export class RelatedController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

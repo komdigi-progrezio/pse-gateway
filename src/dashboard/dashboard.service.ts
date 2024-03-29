@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 import { formattedDate } from './config/formattedDate';
 import { Observable } from 'rxjs';
+import { saveApp } from 'src/utils/app';
 
 @Injectable()
 export class DashboardService {
@@ -60,7 +61,7 @@ export class DashboardService {
     await workbook.xlsx.writeFile(tempFilePath);
     // Mengirim file Excel sebagai response
     return {
-      path: process.env.APP_DOMAIN + '/api/storage/report_excel/' + filePath,
+      path: saveApp(process.env.APP_DOMAIN) + '/api/storage/report_excel/' + filePath,
       status: 200,
     };
   }

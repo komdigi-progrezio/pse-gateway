@@ -4,6 +4,7 @@ import { DashboardService } from './dashboard.service';
 import { getCachedData } from 'src/utils/getCachedData';
 import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { saveHost, savePort } from 'src/utils/app';
 import { Cache } from 'cache-manager';
 
 @Controller('api/dashboard')
@@ -15,7 +16,10 @@ export class DashboardController {
   ) {}
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

@@ -4,12 +4,16 @@ import {
   ClientProxyFactory,
   Transport,
 } from '@nestjs/microservices';
+import { saveHost, savePort } from 'src/utils/app';
 
 export class checkProgress {
   constructor() {
     this.notifClient = ClientProxyFactory.create({
       transport: Transport.TCP,
-      options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+      options: {
+        host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+        port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+      },
     });
   }
   private readonly notifClient: ClientProxy;

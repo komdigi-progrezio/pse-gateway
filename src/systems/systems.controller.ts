@@ -18,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
+import { saveHost, savePort } from 'src/utils/app';
 import { firstValueFrom } from 'rxjs';
 import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 
@@ -30,13 +31,19 @@ export class SystemsController {
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+      port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+    },
   })
   private readonly clientNotification: ClientProxy;
 

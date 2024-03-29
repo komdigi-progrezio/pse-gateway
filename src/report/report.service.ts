@@ -4,12 +4,16 @@ import { formattedDate } from './config/formattedDate';
 import * as archiver from 'archiver';
 import * as fs from 'fs';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Injectable()
 export class ReportService {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

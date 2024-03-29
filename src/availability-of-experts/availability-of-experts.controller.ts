@@ -11,12 +11,16 @@ import { Client, ClientProxy, Transport } from '@nestjs/microservices';
 import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { checkProgress } from 'src/utils/checkProgress';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/availability-of-experts')
 export class AvailabilityOfExpertsController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_CORE_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_CORE_SERVICE_HOST),
+      port: savePort(process.env.PSE_CORE_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 

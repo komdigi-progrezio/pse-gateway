@@ -15,24 +15,34 @@ import { multerOptions } from './config/public.config.upload';
 import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
+import { saveHost, savePort } from 'src/utils/app';
 
 @Controller('api/public')
 export class PublicController {
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_MASTER_DATA_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_MASTERDATA_SERVICE_HOST),
+      port: savePort(process.env.PSE_MASTERDATA_SERVICE_PORT),
+    },
   })
   private readonly client: ClientProxy;
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_NOTIFICATION_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_NOTIFICATION_SERVICE_HOST),
+      port: savePort(process.env.PSE_NOTIFICATION_SERVICE_PORT),
+    },
   })
   private readonly clientNotification: ClientProxy;
 
   @Client({
     transport: Transport.TCP,
-    options: { port: +process.env.PSE_USER_SERVICE_PORT },
+    options: {
+      host: saveHost(process.env.PSE_USER_SERVICE_HOST),
+      port: savePort(process.env.PSE_USER_SERVICE_PORT),
+    },
   })
   private readonly clientUser: ClientProxy;
 
