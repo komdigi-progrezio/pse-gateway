@@ -4,7 +4,7 @@ import { formattedDate } from './config/formattedDate';
 import * as archiver from 'archiver';
 import * as fs from 'fs';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
-import { saveHost, savePort } from 'src/utils/app';
+import { saveApp, saveHost, savePort } from 'src/utils/app';
 
 @Injectable()
 export class ReportService {
@@ -71,7 +71,7 @@ export class ReportService {
 
     await workbook.xlsx.writeFile(tempFilePath);
     return {
-      path: process.env.APP_DOMAIN + '/api/storage/statistics/' + filePath,
+      path: saveApp(process.env.APP_DOMAIN) + '/api/storage/statistics/' + filePath,
       status: 200,
     };
   }
@@ -184,7 +184,7 @@ export class ReportService {
     await workbook.xlsx.writeFile(tempFilePath);
 
     return {
-      path: process.env.APP_DOMAIN + '/api/storage/statistics/' + filePath,
+      path: saveApp(process.env.APP_DOMAIN) + '/api/storage/statistics/' + filePath,
       status: 200,
     };
   }
@@ -335,7 +335,7 @@ export class ReportService {
     archive.finalize();
 
     return {
-      path: process.env.APP_DOMAIN + '/api/storage/statistics/' + filePath,
+      path: saveApp(process.env.APP_DOMAIN) + '/api/storage/statistics/' + filePath,
       status: 200,
     };
   }

@@ -87,7 +87,8 @@ export class RolesController {
   }
 
   private async fetchDataFromSso(token: string, email: string): Promise<any> {
-    const url = `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`;
+    const keycloakDomain = process.env.KEYCLOACK_DOMAIN || 'https://sso-dev.layanan.go.id/auth';
+    const url = `${keycloakDomain}/admin/realms/SPBE/users`;
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${token}`,

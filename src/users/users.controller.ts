@@ -384,13 +384,14 @@ export class UsersController {
 
     try {
       const payload = {
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
+        client_id: process.env.CLIENT_ID || 'pse',
+        client_secret: process.env.CLIENT_SECRET || '8fdc050a-3828-4568-818b-59ab07774e39',
         refresh_token: data.refresh_token,
       };
 
+      const keycloakDomain = process.env.KEYCLOACK_DOMAIN || 'https://sso-dev.layanan.go.id/auth';
       const logout = await axios.post(
-        `${process.env.KEYCLOACK_DOMAIN}/realms/SPBE/protocol/openid-connect/logout`,
+        `${keycloakDomain}/realms/SPBE/protocol/openid-connect/logout`,
         querystring.stringify(payload), // Mengonversi payload ke format x-www-form-urlencoded
         {
           headers: {
@@ -484,8 +485,9 @@ export class UsersController {
     };
 
     try {
+      const keycloakDomain = process.env.KEYCLOACK_DOMAIN || 'https://sso-dev.layanan.go.id/auth';
       const response = await axios.get(
-        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`,
+        `${keycloakDomain}/admin/realms/SPBE/users`,
         config,
       );
       const userData = response.data;
@@ -504,8 +506,9 @@ export class UsersController {
     };
 
     try {
+      const keycloakDomain = process.env.KEYCLOACK_DOMAIN || 'https://sso-dev.layanan.go.id/auth';
       const response = await axios.post(
-        `${process.env.KEYCLOACK_DOMAIN}/admin/realms/SPBE/users`,
+        `${keycloakDomain}/admin/realms/SPBE/users`,
         data,
         config,
       );
