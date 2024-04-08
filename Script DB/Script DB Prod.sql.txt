@@ -1,0 +1,37 @@
+-- ACCOUNT
+ALTER TABLE public.account ADD is_notify bool NULL;
+update public.account set username = 'johan.suyono@deltadatamandiri.com' ,is_notify = true where id = 627;
+
+-- ACCOUNT_ROLES
+
+CREATE TABLE public.account_roles (
+	role_id int8 NULL,
+	account_id int8 NULL,
+	id serial4 NOT NULL
+);
+CREATE UNIQUE INDEX account_roles_pkey ON public.account_roles USING btree (id);
+CREATE INDEX fki_fk_account_roles ON public.account_roles USING btree (account_id);
+CREATE INDEX fki_fk_account_roles_account ON public.account_roles USING btree (account_id);
+CREATE INDEX fki_fk_account_roles_roles ON public.account_roles USING btree (role_id);
+
+INSERT INTO account_roles  ( account_id , role_id)
+SELECT  
+id ,
+case
+	when is_admin is not null then 2
+	when is_admin is null and parent_id is null then 3
+	when is_admin is null and parent_id is not null then 4
+end
+
+from account;
+
+-- role_has_permissions
+ALTER TABLE public.role_has_permissions ADD id serial4 NOT NULL;
+
+CREATE UNIQUE INDEX role_has_permissions_pkey_id ON public.role_has_permissions USING btree (id);
+
+-- sis_document
+
+ALTER TABLE public.sis_document ALTER COLUMN sis_profil_id TYPE int4 USING sis_profil_id::int4;
+
+ALTER TABLE public.sis_document ALTER COLUMN category TYPE int4 USING category::int4;
