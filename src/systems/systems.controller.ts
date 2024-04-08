@@ -169,6 +169,23 @@ export class SystemsController {
     return resp;
   }
 
+  @Patch('/publish/:id')
+  @UseInterceptors(NoFilesInterceptor())
+  async publish(@Param('id') id: number) {
+    const clientNotification = new ClientNotificationSend();
+    const resp = await firstValueFrom(this.client.send(
+      'publishSystem',
+      id,
+    ));
+
+    // if (resp.status !== undefined && resp.status == 200) {
+    //   const system = await firstValueFrom(this.client.send('findOneSystem', id));
+    //   clientNotification.send('systemRegistrationInitial', system.data);
+    // }
+    
+    return resp;
+  }
+
   @Patch('/approved/:id')
   @UseInterceptors(NoFilesInterceptor())
   async approve(@Param('id') id: number, @Body() body: any) {
