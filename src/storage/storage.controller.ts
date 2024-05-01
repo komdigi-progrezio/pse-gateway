@@ -209,7 +209,7 @@ export class StorageController {
     }
   }
 
-  @Get('/dokumen_pejabat/:document')
+  @Get('/dokumen_pejabat/:id/:document')
   async getDocumentPejabat(@Param() data: any, @Res() response: Response) {
     try {
       const dataResp = await this.clientUser
