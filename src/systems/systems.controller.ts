@@ -83,6 +83,11 @@ export class SystemsController {
     return this.client.send('findOneSystem', id);
   }
 
+  @Get('/generate/:id')
+  async manualGenerate(@Param('id') id: number) {
+    return this.client.send('manualGenerate', id);
+  }
+
   @Get('/filter/approved')
   async filerApprove(@Query() request: any, @Req() req: any) {
     const headers = req.headers;
