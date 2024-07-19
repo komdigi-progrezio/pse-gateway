@@ -388,6 +388,11 @@ export class UsersController {
         client_secret: process.env.CLIENT_SECRET || '8fdc050a-3828-4568-818b-59ab07774e39',
         refresh_token: data.refresh_token,
       };
+      
+      const decoded = await this.jwtService.decode(data.token);
+      const email = decoded.email;
+
+      await this.client.send('outUser', email).toPromise();
 
       const keycloakDomain = process.env.KEYCLOACK_DOMAIN || 'https://sso-dev.layanan.go.id/auth';
       const logout = await axios.post(
