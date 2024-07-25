@@ -1,0 +1,30 @@
+default:
+  before_script:
+    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD $REGISTRY_HOST
+
+stages:
+  - build
+  - deploy
+
+build-job:
+  stage: build
+  tags:
+    - pse-docker
+  script:
+    - echo "building application"
+    - docker info
+    - docker build -t $REGISTRY_TAG_HOST/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME .
+    - docker push $REGISTRY_TAG_HOST/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+
+  only:
+    - pse-om2024/prod
+
+deploy-job:
+  stage: deploy
+  tags:
+    - pse-docker
+  script:
+    - echo "deploy application"
+    - echo "deploy completed"
+  only:
+    - pse-om2024/prod
