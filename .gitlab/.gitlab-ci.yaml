@@ -1,30 +1,59 @@
-default:
-  before_script:
-    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD $REGISTRY_HOST
-
 stages:
-  - build
+  - publish
   - deploy
+  
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_VERSION: "20.10"
+  DOCKER_CONFIG_FILE: "--config .docker"
+  DOCKER_REGCRED: "nexus-regcred"
+  CI_IMAGE_NAME: "${REGISTRY}/${GROUP_NAME}/${APP_NAME}"
+  APP_NAME: ${CI_PROJECT_NAME}
+  APP_ENV: "dev"
+  GROUP_NAME: "pse-om2024"
+  APP_NAMESPACE: "pse-om2024"
+  APP_PORT: 8000
 
-build-job:
-  stage: build
+publish:
+  stage: publish
+  image: docker:${DOCKER_VERSION}-cli
   tags:
-    - pse-docker
+    - docker
+  services:
+    - name: docker:${DOCKER_VERSION}-dind
+      entrypoint:
+        - dockerd-entrypoint.sh
+      command:
+        - "--insecure-registry=private.nexus-regs.docker:8087"
+        - "--insecure-registry=private.nexus-regs.docker:8086"
+      alias: dockerd
+  variables:
+    DOCKER_HOST: tcp://dockerd:2375
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - mkdir -p .docker/ && cat $DOCKER_CONF_JSON > .docker/config.json
   script:
-    - echo "building application"
-    - docker info
-    - docker build -t $REGISTRY_TAG_HOST/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME .
-    - docker push $REGISTRY_TAG_HOST/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-
+    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID} .
+    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
   only:
     - pse-om2024/prod
 
-deploy-job:
+deploy-dev:
+  image:
+    name: 'private.nexus-regs.docker:8086/runner/kubectl-run:3.3.1'
   stage: deploy
   tags:
-    - pse-docker
+    - docker
+  variables:
+    CLUSTER_CONFIG: ${CLUSTER_DEV}
+    PROJECT_ID: 'c-7j2fq:p-hf9z4'
+    APP_URN: 'pse-dev.layanan.go.id'
+    APP_URN_PATH: '/'
   script:
-    - echo "deploy application"
-    - echo "deploy completed"
+    - envsubst < deployment.yaml > deployment-dev.yaml
+    - cat deployment-dev.yaml
+    - kubectl apply -f deployment-dev.yaml
+  needs:
+    - job: publish
   only:
     - pse-om2024/prod
