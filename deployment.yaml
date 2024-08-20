@@ -1,19 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${APP_NAMESPACE}
+  annotations:
+    field.cattle.io/projectId: ${PROJECT_ID}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pse-gateway
+  name: ${APP_NAME}
+  namespace: ${APP_NAMESPACE}
+  labels:
+    workload.user.cattle.io/workloadselector: deployment-${APP_NAMESPACE}-${APP_NAME}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pse-gateway
+      workload.user.cattle.io/workloadselector: deployment-${APP_NAMESPACE}-${APP_NAME}
   template:
     metadata:
       labels:
-        app: pse-gateway
+        workload.user.cattle.io/workloadselector: deployment-${APP_NAMESPACE}-${APP_NAME}
     spec:
+      imagePullSecrets:
+      - name: ext-docker-registry
       containers:
-      - name: pse-gateway
-        image: pse/pse-gateway:latest
+      - name: ${APP_NAME}
+        image: ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
         ports:
-        - containerPort: 8000
+        - containerPort: ${APP_PORT}
+          name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}-svc
+  namespace: ${APP_NAMESPACE}
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["deployment:${APP_NAMESPACE}:${APP_NAME}"]'
+    workload.cattle.io/targetWorkloadIdNoop: "true"
+    workload.cattle.io/workloadPortBased: "true"
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  ports:
+  - name: web
+    port: ${APP_PORT}
+    protocol: TCP
+    targetPort: ${APP_PORT}
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-${APP_NAMESPACE}-${APP_NAME}
+  sessionAffinity: None
+  type: ClusterIP
