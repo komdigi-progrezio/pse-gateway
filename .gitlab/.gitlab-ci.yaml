@@ -68,7 +68,7 @@ deploy-prd:
   variables:
     CLUSTER_CONFIG: ${CLUSTER_PRD}
     PROJECT_ID: 'c-blkmc:p-4fkdt'
-    APP_URN: 'pse-dev.layanan.go.id'
+    APP_URN: 'pse.layanan.go.id'
     APP_URN_PATH: '/'
   script:
     - envsubst < deployment.yaml > deployment-prd.yaml
