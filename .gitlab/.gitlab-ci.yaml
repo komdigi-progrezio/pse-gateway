@@ -33,10 +33,11 @@ publish:
   before_script:
     - mkdir -p .docker/ && cat $DOCKER_CONF_JSON > .docker/config.json
   script:
-    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID} .
-    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
+    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID} .
+    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID}
   only:
-    - pse-om2024/prod
+    - pse-om2024-dev
+    - pse-om2024-prd
 
 deploy-dev:
   image:
@@ -56,4 +57,24 @@ deploy-dev:
   needs:
     - job: publish
   only:
-    - pse-om2024/prod
+    - pse-om2024-dev
+
+deploy-prd:
+  image:
+    name: 'private.nexus-regs.docker:8086/runner/kubectl-run:3.3.1'
+  stage: deploy
+  tags:
+    - docker
+  variables:
+    CLUSTER_CONFIG: ${CLUSTER_PRD}
+    PROJECT_ID: 'c-blkmc:p-4fkdt'
+    APP_URN: 'pse-dev.layanan.go.id'
+    APP_URN_PATH: '/'
+  script:
+    - envsubst < deployment.yaml > deployment-prd.yaml
+    - cat deployment-prd.yaml
+    - kubectl apply -f deployment-prd.yaml
+  needs:
+    - job: publish
+  only:
+    - pse-om2024-prd
