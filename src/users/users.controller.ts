@@ -322,7 +322,9 @@ export class UsersController {
       const user = await firstValueFrom(this.client.send('findOneUser', id));
       let keycloakId: string;
       if (status === 'enable') {
-        keycloakId = await this.enable(user.data, token);
+        // keycloakId = await this.enable(user.data, token);
+        keycloakId = '-'
+
       }
 
       const request = {
@@ -526,6 +528,7 @@ export class UsersController {
   private async enable(user: any, token: any): Promise<string> {
     let keycloakId: string;
     const existUser = await this.getUserByEmail(user.username, token);
+    
     if (!existUser) {
       const data = {
         firstName: user.nama,
@@ -543,7 +546,10 @@ export class UsersController {
       if (user.is_admin) {
         data['groups'] = ['Admin'];
       }
+      console.log("Second Await")
       const newUserResp = await this.createUser(data, token);
+      console.log("Tird Await")
+
       const existUser = await this.getUserByEmail(user.username, token);
       keycloakId = existUser.id;
     } else {
