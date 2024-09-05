@@ -322,9 +322,7 @@ export class UsersController {
       const user = await firstValueFrom(this.client.send('findOneUser', id));
       let keycloakId: string;
       if (status === 'enable') {
-        // keycloakId = await this.enable(user.data, token);
-        keycloakId = '-'
-
+        keycloakId = await this.enable(user.data, token);
       }
 
       const request = {
@@ -497,7 +495,8 @@ export class UsersController {
         `${keycloakDomain}/admin/realms/SPBE/users`,
         config,
       );
-      const userData = response.data;
+      const userData = response?.data;
+      console.log(JSON.stringify(response?.data))
       return userData.length > 0 ? userData[0] : null;
     } catch (error) {
       throw error;
@@ -527,6 +526,7 @@ export class UsersController {
 
   private async enable(user: any, token: any): Promise<string> {
     let keycloakId: string;
+    console.log("First Await")
     const existUser = await this.getUserByEmail(user.username, token);
     
     if (!existUser) {
