@@ -36,7 +36,7 @@ publish:
     - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID} .
     - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
   only:
-    - pse-om2024/prod
+    - pse-om2024-prod
 
 deploy-dev:
   image:
