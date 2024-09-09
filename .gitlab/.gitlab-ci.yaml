@@ -33,7 +33,7 @@ publish:
   before_script:
     - mkdir -p .docker/ && cat $DOCKER_CONF_JSON > .docker/config.json
   script:
-    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID} .
-    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${APP_ENV}-${CI_PIPELINE_IID}
+    - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID} .
+    - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID}
   only:
     - pse-om2024-prod

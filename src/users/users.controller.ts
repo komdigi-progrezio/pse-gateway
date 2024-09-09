@@ -495,7 +495,8 @@ export class UsersController {
         `${keycloakDomain}/admin/realms/SPBE/users`,
         config,
       );
-      const userData = response.data;
+      const userData = response?.data;
+      console.log(JSON.stringify(response?.data))
       return userData.length > 0 ? userData[0] : null;
     } catch (error) {
       throw error;
@@ -525,7 +526,9 @@ export class UsersController {
 
   private async enable(user: any, token: any): Promise<string> {
     let keycloakId: string;
+    console.log("First Await")
     const existUser = await this.getUserByEmail(user.username, token);
+    
     if (!existUser) {
       const data = {
         firstName: user.nama,
@@ -543,7 +546,10 @@ export class UsersController {
       if (user.is_admin) {
         data['groups'] = ['Admin'];
       }
+      console.log("Second Await")
       const newUserResp = await this.createUser(data, token);
+      console.log("Tird Await")
+
       const existUser = await this.getUserByEmail(user.username, token);
       keycloakId = existUser.id;
     } else {
