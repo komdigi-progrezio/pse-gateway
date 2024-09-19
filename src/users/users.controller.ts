@@ -313,6 +313,7 @@ export class UsersController {
     @Req() req: any,
   ) {
     const headers = req.headers;
+    const alasan = req.body.alasan;
     const token = headers.authorization?.split(' ')[1];
     if (!token) {
       return { message: 'Unauthorized' };
@@ -329,6 +330,7 @@ export class UsersController {
         status,
         id,
         keycloakId,
+        alasan,
       };
 
       const resp = await firstValueFrom(
@@ -344,12 +346,21 @@ export class UsersController {
             ),
           );
         } else if (status === 'disable') {
-          await firstValueFrom(
-            this.notificationClient.send(
-              'userDisableAccountSubstitution',
-              user.data,
-            ),
-          );
+          if ((alasan && alasan.trim() !== '') || alasan !== undefined) {
+            await firstValueFrom(
+              this.notificationClient.send(
+                'userRejectRegistration',
+                user.data,
+              ),
+            );
+          } else {
+            await firstValueFrom(
+              this.notificationClient.send(
+                'userDisableAccountSubstitution',
+                user.data,
+              ),
+            );
+          }
         }
       }
 
