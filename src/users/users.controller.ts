@@ -22,7 +22,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import * as querystring from 'querystring';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
 import { multerOptions } from './config/users.config.upload';
 import { Response, response } from 'express';
 import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
@@ -333,6 +333,11 @@ export class UsersController {
         alasan,
       };
 
+      let userRejectData = {
+        user: user.data,
+        alasan: alasan,
+      };
+
       const resp = await firstValueFrom(
         this.client.send('changeStatusUser', request),
       );
@@ -350,7 +355,7 @@ export class UsersController {
             await firstValueFrom(
               this.notificationClient.send(
                 'userRejectRegistration',
-                user.data,
+                userRejectData,
               ),
             );
           } else {
