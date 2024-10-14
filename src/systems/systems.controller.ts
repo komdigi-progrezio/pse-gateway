@@ -10,13 +10,14 @@ import {
   Body,
   Patch,
   Delete,
+  UploadedFile
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Client, ClientProxy, Transport } from '@nestjs/microservices';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { saveHost, savePort } from 'src/utils/app';
 import { firstValueFrom } from 'rxjs';
@@ -129,8 +130,9 @@ export class SystemsController {
   }
 
   @Post()
-  @UseInterceptors(NoFilesInterceptor())
-  async create(@Req() request: any, @Body() body: any) {
+  @UseInterceptors(FileInterceptor('dokumen'))
+  async create(@Req() request: any, @Body() body: any, @UploadedFile() file: any,) {
+    body.file = file;
     const clientNotification = new ClientNotificationSend();
     const headers = request.headers;
     const token = headers.authorization?.split(' ')[1];
