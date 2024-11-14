@@ -446,6 +446,20 @@ export class UsersController {
 
     return this.client.send('updateUser', body);
   }
+
+  @Post('/get-otp')
+  async userByUsername(@Query() request: any) {
+    const response = await firstValueFrom(this.client.send('getUserByUsername', request));
+    console.log('GETOTP-log === ', response)
+    if (response) {
+      await firstValueFrom(
+        this.notificationClient.send('userGetOtp', response),
+      );
+    }
+
+    return response;
+  }
+
   @Post('/parent/account')
   @UseInterceptors(FileInterceptor('dokumen'))
   async storeParent(
@@ -572,5 +586,9 @@ export class UsersController {
       keycloakId = existUser.id;
     }
     return keycloakId;
+  }
+
+  private async getUserByUsername(data: any): Promise<any> {
+
   }
 }
