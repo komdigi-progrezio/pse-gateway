@@ -24,7 +24,7 @@ import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { getCachedData } from 'src/utils/getCachedData';
 import { firstValueFrom, take } from 'rxjs';
 import { multerOptions } from './config/users.config.upload';
-import { Response, response } from 'express';
+import { Request, Response, response } from 'express';
 import { ClientNotificationSend } from 'src/utils/clientNotificationSend';
 import { saveHost, savePort } from 'src/utils/app';
 
@@ -449,15 +449,50 @@ export class UsersController {
 
   @Post('/get-otp')
   async userByUsername(@Query() request: any) {
-    const response = await firstValueFrom(this.client.send('getUserByUsername', request));
-    console.log('GETOTP-log === ', response)
-    if (response) {
-      await firstValueFrom(
-        this.notificationClient.send('userGetOtp', response),
-      );
-    }
+    console.log('GETOTPreq-log === ', request)
 
-    return response;
+    const { recaptcha } = request.body
+
+    if (!recaptcha) {
+      return { 
+        success: false, 
+        message: "reCAPTCHA tidak valid!" 
+      }
+    }
+  
+    const secretKey = "6LdkfoMqAAAAADgBLa27_UjuBaNdcBK6AIR36pIJ"
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptcha}`
+  
+    try {
+      const response = await axios.post(
+        verificationUrl,
+        new URLSearchParams({
+          secret: secretKey,
+          response: recaptcha,
+        }).toString(),
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+  
+      const data = response.data
+
+      const responseOTP = data && await firstValueFrom(this.client.send('getUserByUsername', request));
+      console.log('GETOTP-log === ', responseOTP)
+      if (responseOTP) {
+        await firstValueFrom(
+          this.notificationClient.send('userGetOtp', responseOTP),
+        );
+      }
+  
+      return {
+        status: 200,
+        message: 'Verifikasi berhasil',
+        response: responseOTP,
+      };
+    } catch (error) {
+      throw error
+    }
   }
 
   @Post('/parent/account')
@@ -588,7 +623,40 @@ export class UsersController {
     return keycloakId;
   }
 
-  private async getUserByUsername(data: any): Promise<any> {
+  private async verifyRecaptcha(req: Request, res: Response): Promise<any> {
+    const { recaptcha } = req.body
 
+    if (!recaptcha) {
+      return res.status(400).json({ success: false, message: "reCAPTCHA tidak valid!" });
+    }
+  
+    const secretKey = "YOUR_SECRET_KEY"; 
+    const verificationUrl = "https://www.google.com/recaptcha/api/siteverify";
+  
+    try {
+      const response = await axios.post(
+        verificationUrl,
+        new URLSearchParams({
+          secret: secretKey,
+          response: recaptcha,
+        }).toString(),
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+  
+      const data = response.data;
+  
+      if (data.success) {
+        res.json({ success: true, message: "Verifikasi berhasil!" });
+      } else {
+        res.status(400).json({ success: false, message: "Verifikasi gagal!" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+
+    return res
   }
 }
