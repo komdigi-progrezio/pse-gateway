@@ -36,12 +36,17 @@ export class getCachedData {
   async account(token: string): Promise<any> {
     const decoded = await this.getDecodedToken(token);
     const email = decoded.email;
+    console.log('logAccountEmail === ', email)
+    console.log('logAccountToken === ', token)
 
     let cacheData = await this.cacheService.get(token);
+    console.log('logCacheData === ', cacheData)
 
     if (!cacheData) {
       const ssoData = await this.fetchDataFromSso(token, email);
       const userData = await this.client.send('authUser', email).toPromise();
+      console.log('logSSODATA === ', ssoData)
+      console.log('loguserData === ', userData)
 
       if (ssoData && userData && userData.data && userData.data.status == 1) {
         cacheData = userData || null;

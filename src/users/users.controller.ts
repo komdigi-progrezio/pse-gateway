@@ -623,40 +623,4 @@ export class UsersController {
     return keycloakId;
   }
 
-  private async verifyRecaptcha(req: Request, res: Response): Promise<any> {
-    const { recaptcha } = req.body
-
-    if (!recaptcha) {
-      return res.status(400).json({ success: false, message: "reCAPTCHA tidak valid!" });
-    }
-  
-    const secretKey = "YOUR_SECRET_KEY"; 
-    const verificationUrl = "https://www.google.com/recaptcha/api/siteverify";
-  
-    try {
-      const response = await axios.post(
-        verificationUrl,
-        new URLSearchParams({
-          secret: secretKey,
-          response: recaptcha,
-        }).toString(),
-        {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        }
-      );
-  
-      const data = response.data;
-  
-      if (data.success) {
-        res.json({ success: true, message: "Verifikasi berhasil!" });
-      } else {
-        res.status(400).json({ success: false, message: "Verifikasi gagal!" });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-
-    return res
-  }
 }

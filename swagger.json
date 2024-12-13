@@ -373,6 +373,28 @@
         }
       }
     },
+    "/api/login-activity": {
+      "post": {
+        "operationId": "LoginActivityController_createLogActivity",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/login-activity/get-access-token": {
+      "post": {
+        "operationId": "LoginActivityController_getAccToken",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/roles/filter": {
       "get": {
         "operationId": "RolesController_getAllRoles",
