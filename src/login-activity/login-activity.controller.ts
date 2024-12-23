@@ -80,12 +80,12 @@ export class LoginActivityController {
   @Post('/get-access-token')
   @UseInterceptors(NoFilesInterceptor())
   async getAccToken(@Body() data: any) {
-    const url = 'https://api-splpdev.layanan.go.id/api-sso-dev/1.0/realms/SPBE/protocol/openid-connect/token';
+    const url = process.env.URL_GET_TOKEN || 'https://api-splpdev.layanan.go.id/api-sso-dev/1.0/realms/SPBE/protocol/openid-connect/token';
 
     const params = new URLSearchParams();
-    params.append('client_id', 'testing-sso');
-    params.append('client_secret', 'c0baeb95-a154-4225-a2fc-cfaaf3d52075');
-    params.append('grant_type', 'password');
+    params.append('client_id', process.env.CLIENT_ID_GET_TOKEN || 'testing-sso');
+    params.append('client_secret', process.env.CLIENT_SECRET_GET_TOKEN || 'c0baeb95-a154-4225-a2fc-cfaaf3d52075');
+    params.append('grant_type', process.env.GRANT_TYPE_GET_TOKEN || 'password');
     params.append('username', data.username);
     params.append('password', data.password);
 
@@ -139,4 +139,38 @@ export class LoginActivityController {
   async verifyOtp(@Body() data: any) {
     return this.client.send('verifyOtp', data);
   }
+
+  @Post('/reaccess-token')
+  @UseInterceptors(NoFilesInterceptor())
+  async reAccToken(@Body() data: any) {
+    const url = process.env.URL_GET_TOKEN || 'https://api-splpdev.layanan.go.id/api-sso-dev/1.0/realms/SPBE/protocol/openid-connect/token';
+
+    const params = new URLSearchParams();
+    params.append('client_id', process.env.CLIENT_ID_GET_TOKEN || 'testing-sso');
+    params.append('client_secret', process.env.CLIENT_SECRET_GET_TOKEN || 'c0baeb95-a154-4225-a2fc-cfaaf3d52075');
+    params.append('grant_type', process.env.GRANT_TYPE_GET_TOKEN || 'password');
+    params.append('username', data.username);
+    params.append('password', data.password);
+
+    console.log('reaccessTokenData-CHECK === ',data)
+
+    try {
+      const response = await axios.post(url, params.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+
+      console.log('reaccessTokenResponse-CHECK === ',response)
+
+      if (response.status == 200) {
+        console.log('reAccessToken-successfull')
+      } else {
+        console.log('reAccessToken-failed') 
+      }
+    } catch (error) {
+      console.log('Access Denied - reAccessToken') 
+    }
+  }
+
 }
