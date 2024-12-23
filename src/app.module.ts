@@ -37,6 +37,7 @@ import { NotifikasiModule } from './notifikasi/notifikasi.module';
 import { PersonInChargeModule } from './person-in-charge/person-in-charge.module';
 import { OrganizersModule } from './organizers/organizers.module';
 import { LoginActivityModule } from './login-activity/login-activity.module';
+import { ReasonLogModule } from './reason-log/reason-log.module';
 
 @Module({
   imports: [
@@ -79,7 +80,8 @@ import { LoginActivityModule } from './login-activity/login-activity.module';
     NotifikasiModule,
     PersonInChargeModule,
     OrganizersModule,
-    LoginActivityModule
+    LoginActivityModule,
+    ReasonLogModule,
   ],
   controllers: [ParinstansiController],
 })

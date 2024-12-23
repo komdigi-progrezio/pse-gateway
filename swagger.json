@@ -395,6 +395,28 @@
         }
       }
     },
+    "/api/reason-log/user-list": {
+      "post": {
+        "operationId": "ReasonLogController_reasonLogList",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/reason-log/send-reason": {
+      "post": {
+        "operationId": "ReasonLogController_sendReason",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/roles/filter": {
       "get": {
         "operationId": "RolesController_getAllRoles",
