@@ -36,7 +36,10 @@ export class ParinstansiController {
   async listTreeView(@Query() request: any) {
     return this.client.send('listTreeView', request);
   }
-
+  @Get('/list/new-tree-view')
+  async listNewTreeView(@Query() request: any) {
+    return this.client.send('listNewTreeView', request);
+  }
   @Post()
   @UseInterceptors(NoFilesInterceptor())
   async create(@Body() data: any) {
