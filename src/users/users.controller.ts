@@ -230,14 +230,16 @@ export class UsersController {
     res.status(200).send(resp);
   }
   @Patch('/:id/profile')
-  @UseInterceptors(NoFilesInterceptor())
+  @UseInterceptors(FileInterceptor('dokumen'))
   async updatePatchProfile(
     @Param('id') id: number,
     @Body() data: any,
     @Req() request: any,
     @Res() res: Response,
+    @UploadedFile() file: any,
   ) {
     data.id = id;
+    data.file = file;
     const resp = await firstValueFrom(this.client.send('updateProfile', data));
 
     const headers = request.headers;

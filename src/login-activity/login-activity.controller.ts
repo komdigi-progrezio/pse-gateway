@@ -165,6 +165,9 @@ export class LoginActivityController {
 
       if (response.status == 200) {
         console.log('reAccessToken-successfull')
+        return {
+          data: response.data,
+        }
       } else {
         console.log('reAccessToken-failed') 
       }
