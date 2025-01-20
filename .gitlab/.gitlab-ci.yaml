@@ -9,7 +9,7 @@ variables:
   DOCKER_REGCRED: "nexus-regcred"
   CI_IMAGE_NAME: "${REGISTRY}/${GROUP_NAME}/${APP_NAME}"
   APP_NAME: ${CI_PROJECT_NAME}
-  APP_ENV: "dev"
+  APP_ENV: "prod"
   GROUP_NAME: "pse-om2024"
   APP_NAMESPACE: "pse-om2024"
   APP_PORT: 8000
@@ -36,45 +36,4 @@ publish:
     - docker $DOCKER_CONFIG_FILE build --tag ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID} .
     - docker $DOCKER_CONFIG_FILE push ${CI_IMAGE_NAME}:${CI_COMMIT_REF_NAME}-${CI_PIPELINE_IID}
   only:
-    - pse-om2024-dev
-    - pse-om2024-prd
-
-deploy-dev:
-  image:
-    name: 'private.nexus-regs.docker:8086/runner/kubectl-run:3.3.1'
-  stage: deploy
-  tags:
-    - docker
-  variables:
-    CLUSTER_CONFIG: ${CLUSTER_DEV}
-    PROJECT_ID: 'c-7j2fq:p-hf9z4'
-    APP_URN: 'pse-dev.layanan.go.id'
-    APP_URN_PATH: '/'
-  script:
-    - envsubst < deployment.yaml > deployment-dev.yaml
-    - cat deployment-dev.yaml
-    - kubectl apply -f deployment-dev.yaml
-  needs:
-    - job: publish
-  only:
-    - pse-om2024-dev
-
-deploy-prd:
-  image:
-    name: 'private.nexus-regs.docker:8086/runner/kubectl-run:3.3.1'
-  stage: deploy
-  tags:
-    - docker
-  variables:
-    CLUSTER_CONFIG: ${CLUSTER_PRD}
-    PROJECT_ID: 'c-blkmc:p-4fkdt'
-    APP_URN: 'pse.layanan.go.id'
-    APP_URN_PATH: '/'
-  script:
-    - envsubst < deployment.yaml > deployment-prd.yaml
-    - cat deployment-prd.yaml
-    - kubectl apply -f deployment-prd.yaml
-  needs:
-    - job: publish
-  only:
-    - pse-om2024-prd
+    - pse-om2024-prod
