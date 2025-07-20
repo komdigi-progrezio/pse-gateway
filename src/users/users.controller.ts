@@ -173,6 +173,11 @@ export class UsersController {
     return this.client.send('newManager', id);
   }
 
+  @Post('create-password')
+  async createPassword(@Body() body: { token: string; password: string }) {
+    return this.client.send('create-password', body);
+  }
+
   @Post('/:id/official')
   @UseInterceptors(NoFilesInterceptor())
   async updateUser(
@@ -383,6 +388,13 @@ export class UsersController {
   async dropdown(@Query() request: any) {
     return this.client.send('dropdownUser', request);
   }
+
+  @Post('/login-local')
+  @UseInterceptors(NoFilesInterceptor())
+  async loginLocal(@Body() body: { username: string; password: string }) {
+    return this.client.send('login-local', body);
+  }
+
 
   @Get('/:id')
   async viewData(@Param('id') id: number, @Query() request: any) {
